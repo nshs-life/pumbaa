@@ -1,0 +1,16 @@
+{
+  "name": "nshs.life.bot",
+  "version": "1.0.0",
+  "description": "covering the automated needs for nshs.life",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Michael",
+  "license": "ISC",
+  "dependencies": {
+    "@discordjs/rest": "^1.0.1",
+    "discord.js": "^14.1.2",
+    "googleapis": "^105.0.0"
+  }
+}
