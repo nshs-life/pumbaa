@@ -131,7 +131,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
 		//create thread for tutor and tutee
 		let channel = client.channels.cache.get('1005202136080068628')
 		const thread = await channel.threads.create({
-			name: `Session ongoing. Tutor - ${user.username} | Tutee - ${requestorName}`,
+			name: `Subject - ${reaction.message.embeds[0].fields[0].name.split(/Subject: /)[1]} | Tutor - ${user.username} | Tutee - ${requestorName}`,
 			autoArchiveDuration: 10080,
 			type: ChannelType.GuildPublicThread
 		});
