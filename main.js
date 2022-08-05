@@ -34,7 +34,7 @@ for (const file of eventFiles) {
 }
 
 
-//user command action
+//user commands handler
 client.on('interactionCreate', async interaction => {
 	if (!interaction.isChatInputCommand()) return;
 
@@ -50,7 +50,7 @@ client.on('interactionCreate', async interaction => {
 });
 
 
-//handing new members
+//new members handler
 client.on('guildMemberAdd', member => {
 
 	//adding "new member" role
@@ -110,6 +110,27 @@ client.on('messageCreate', msg => {
 	}
 
 });
+
+
+//reactions handler
+// client.on('messageReactionAdd', async (reaction, user) => {
+
+// 	let guild = client.guilds.cache.get('1004509586142806086')
+
+// 	//add specific grade role to member
+
+
+// 	//tutor accept
+// 	if (reaction.emoji.name == '✅' && reaction.message.channelId == '1005048112890511450' && user.bot == false) {
+// 		guild.members.fetch(reaction.message.id)
+// 			.then(member => {
+// 				console.log('message by: ' + member.user.tag.split(/#/)[0])
+// 			})
+// 		// console.log(user.send('tutor accepted'))
+// 	}
+
+// })
+
 
 
 client.login(token);

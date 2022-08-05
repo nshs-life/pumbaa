@@ -21,24 +21,37 @@ module.exports = {
 
         //description of what they need help with
         .addStringOption(option =>
-            option.setName('request')
+            option.setName('details')
                 .setDescription('tell tutors what you need help with')
+                .setRequired(true))
+
+        //meeting time needed
+        .addIntegerOption(option =>
+            option.setName('time')
+                .setDescription('request length of meeting (minutes)')
                 .setRequired(true)),
     async execute(interaction) {
 
         const subject = interaction.options.getString('subject')
-        const request = interaction.options.getString('request')
+        const details = interaction.options.getString('details')
+        const time = interaction.options.getInteger('time')
 
         //format embed
         const Embed = new EmbedBuilder()
-            .setTitle('New Request:')
+            .setTitle('New Tutor Request')
             .setDescription('From: ' + interaction.user.tag.split(/#/)[0])
             .setColor(0x18e1ee)
-            .addFields({ name: 'Subject: ' + subject, value: 'Description: ' + request });
+            .addFields({ name: 'Subject: ' + subject, value: 'Details: ' + details })
+            .addFields({ name: 'Estimated meeting time: ', value: time + ' minutes' });
 
         //post request to tutors
         interaction.guild.channels.fetch('1005048112890511450')
-            .then(channel => channel.send({ embeds: [Embed] }))
+            .then(channel => channel.send({ embeds: [Embed] })
+                .then(request => {
+                    request.react("✅")
+                })
+            )
+
         await interaction.reply({ content: 'request posted to tutors', ephemeral: true })
     }
 };
