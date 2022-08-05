@@ -40,9 +40,13 @@ module.exports = {
         const Embed = new EmbedBuilder()
             .setTitle('New Tutor Request')
             .setDescription('From: ' + interaction.user.tag.split(/#/)[0])
-            .setColor(0x18e1ee)
-            .addFields({ name: 'Subject: ' + subject, value: 'Details: ' + details })
-            .addFields({ name: 'Estimated meeting time: ', value: time + ' minutes' });
+            .setColor(0x0099FF)
+            .addFields(
+                { name: 'Subject: ' + subject, value: 'Details: ' + details },
+                { name: 'Estimated meeting time: ', value: time + ' minutes' },
+                { name: '\u200B', value: '\u200B' })
+            .setTimestamp()
+            .setFooter({ text: interaction.user.id });
 
         //post request to tutors
         interaction.guild.channels.fetch('1005048112890511450')
