@@ -5,6 +5,6 @@ module.exports = {
 		.setName('me')
 		.setDescription('Replies with user info'),
 	async execute(interaction) {
-		await interaction.reply(`Your username: ${interaction.user.tag.split(/#/)[0]}\nYour id: ${interaction.user.id}`);
+		await interaction.reply({ content: `Your username: ${interaction.user.tag.split(/#/)[0]}\nYour id: ${interaction.user.id}`, ephemeral: true });
 	}
 };

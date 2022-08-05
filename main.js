@@ -8,18 +8,19 @@ const { waitForDebugger } = require('node:inspector');
 //create client
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildMessageReactions, GatewayIntentBits.DirectMessages, GatewayIntentBits.MessageContent], partials: [Partials.Channel] });
 
-//creating commands collection and locating files in commands folder
+//registering commands
 client.commands = new Collection();
 const commandsPath = path.join(__dirname, 'commands');
 const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
 
-//adding commands to collection
 for (const file of commandFiles) {
 	const filePath = path.join(commandsPath, file);
 	const command = require(filePath);
 	client.commands.set(command.data.name, command);
 }
 
+
+//registering events
 const eventsPath = path.join(__dirname, 'events');
 const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
 
@@ -33,7 +34,8 @@ for (const file of eventFiles) {
 	}
 }
 
-//getting the command (whatever the user types) from client.commands Collection
+
+//user command action
 client.on('interactionCreate', async interaction => {
 	if (!interaction.isChatInputCommand()) return;
 
@@ -47,6 +49,7 @@ client.on('interactionCreate', async interaction => {
 		await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
 	}
 });
+
 
 //handing new members
 client.on('guildMemberAdd', member => {
@@ -68,6 +71,7 @@ client.on('guildMemberAdd', member => {
 
 	member.send({ embeds: [Embed] })
 })
+
 
 //replying to DMs
 client.on('messageCreate', msg => {
@@ -104,10 +108,9 @@ client.on('messageCreate', msg => {
 				}
 
 			})
-
-
 	}
 
 });
+
 
 client.login(token);
