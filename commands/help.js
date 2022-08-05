@@ -11,9 +11,11 @@ module.exports = {
             .setColor(0x18e1ee)
             .addFields({ name: '/about', value: 'about nshs.life' })
             .addFields({ name: '/me', value: 'your account information' })
+            .addFields({ name: '/tutor', value: 'request a tutor' })
             .addFields({ name: '/rant', value: 'send rants about school that will be posted anonymously' });
 
         // await interaction.user.send({  });
-        await interaction.reply({ embeds: [Embed] })
+        await interaction.user.send({ embeds: [Embed] })
+        await interaction.reply({ content: 'check your DMs', ephemeral: true })
     }
 };
