@@ -6,7 +6,7 @@ const { token } = require('./config.json');
 const { waitForDebugger } = require('node:inspector');
 
 //create client
-const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildMessages, GatewayIntentBits.DirectMessages, GatewayIntentBits.MessageContent], partials: [Partials.Channel] });
+const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildMessageReactions, GatewayIntentBits.DirectMessages, GatewayIntentBits.MessageContent], partials: [Partials.Channel] });
 
 //creating commands collection and locating files in commands folder
 client.commands = new Collection();
@@ -75,7 +75,7 @@ client.on('messageCreate', msg => {
 
 	//DM (not from the bot itself)
 	if (msg.channel.type == 1 && msg.author != client.user) {
-		
+
 
 		//regex school email
 		if (msg.content.match(/\d{9}@newton.k12.ma.us/)) {
@@ -86,8 +86,10 @@ client.on('messageCreate', msg => {
 			//add specific grade role to member
 			guild.members.fetch(msg.author.id)
 				.then(member => {
+					// add grade, remove new member
 					member.roles.add(guild.roles.cache.get('1004509586142806093'))
-					member.roles.remove(guild.roles.cache.get('1004509586142806087'))})
+					member.roles.remove(guild.roles.cache.get('1004509586142806087'))
+				})
 
 			msg.channel.send("you can check out the server now!")
 		} else {
