@@ -38,7 +38,6 @@ client.on('interactionCreate', async interaction => {
 	if (!interaction.isChatInputCommand()) return;
 
 	const command = client.commands.get(interaction.commandName);
-
 	if (!command) return;
 
 	try {
@@ -76,25 +75,37 @@ client.on('messageCreate', msg => {
 	//DM (not from the bot itself)
 	if (msg.channel.type == 1 && msg.author != client.user) {
 
+		//check if member is in guild
+		let guild = client.guilds.cache.get('1004509586142806086')
 
-		//regex school email
-		if (msg.content.match(/\d{9}@newton.k12.ma.us/)) {
+		//add specific grade role to member
+		guild.members.fetch(msg.author.id)
+			.then(member => {
 
-			//check if member is in guild
-			let guild = client.guilds.cache.get('1004509586142806086')
+				//new member
+				if (member.roles.cache.has('1004509586142806087')) {
 
-			//add specific grade role to member
-			guild.members.fetch(msg.author.id)
-				.then(member => {
-					// add grade, remove new member
-					member.roles.add(guild.roles.cache.get('1004509586142806093'))
-					member.roles.remove(guild.roles.cache.get('1004509586142806087'))
-				})
+					//regex school email
 
-			msg.channel.send("you can check out the server now!")
-		} else {
-			msg.channel.send("Please enter your school email:")
-		}
+					/* also need them to enter full name */
+					if (msg.content.match(/\d{9}@newton.k12.ma.us/)) {
+						// add grade, remove new member
+						member.roles.add(guild.roles.cache.get('1004509586142806093'))
+						member.roles.remove(guild.roles.cache.get('1004509586142806087'))
+						msg.channel.send("you can check out the server now!")
+
+					} else {
+						msg.channel.send("Please enter your school email to join the server")
+					}
+
+					//already a member
+				} else {
+					msg.channel.send('hello!')
+				}
+
+			})
+
+
 	}
 
 });
