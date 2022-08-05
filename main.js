@@ -1,7 +1,7 @@
 //required classes
 const fs = require('node:fs');
 const path = require('node:path');
-const { Client, Collection, GatewayIntentBits, Partials, EmbedBuilder } = require('discord.js');
+const { Client, Collection, ChannelType, GatewayIntentBits, Partials, EmbedBuilder } = require('discord.js');
 const { token } = require('./config.json');
 
 //create client
@@ -115,34 +115,31 @@ client.on('messageCreate', msg => {
 //reactions handler
 client.on('messageReactionAdd', async (reaction, user) => {
 
+	let guild = client.guilds.cache.get('1004509586142806086')
+
 	//tutor accept
 	if (reaction.emoji.name == '✅' && reaction.message.channelId == '1005048112890511450' && user.bot == false) {
 		const requestorName = reaction.message.embeds[0].description.split(/From: /)[1]
 
-		user.send('confirmation sent to: ' + requestorName)
-		console.log(reaction.message.embeds)
-		// client.guilds.fetch('1004509586142806086')
-		// 	.then(guild => {
+		//send message to tutor and tutee
+		guild.members.fetch(reaction.message.embeds[0].footer.text)
+			.then(member => {
+				member.user.send(user.username + ' accepted your tutor request')
+				user.send('Tutoring confirmation sent to ' + requestorName)
+			})
 
-		// 		// member.user.send(user.username + ' accepted your tutor request')
-		// 	})
+		//create thread for tutor and tutee
+		let channel = client.channels.cache.get('1005202136080068628')
+		const thread = await channel.threads.create({
+			name: `Session ongoing. Tutor - ${user.username} | Tutee - ${requestorName}`,
+			autoArchiveDuration: 10080,
+			type: ChannelType.GuildPublicThread
+		});
 
-		// let channel = client.channels.cache.get(reaction.message.channelId)
-		// console.log(channel)
-		//.guild.channels.fetch('1005048112890511450')
-		// const thread = await channel.threads.create({
-		// 	name: 'tutor session',
-		// 	autoArchiveDuration: MAX,
-		// 	type: ChannelType.GuildPrivateThread,
-		// 	reason: 'Needed a separate thread for moderation',
-		// });
+		thread.members.add(user.id);
+		thread.members.add(reaction.message.embeds[0].footer.text);
 
-		// thread.members.add(user.id);
-		// thread.members.add(reaction.message.author.id);
-		// const thread = channel.threads.cache.find(x => x.name === 'food-talk');
-		// await thread.members.remove('140214425276776449');
 	}
-
 })
 
 
