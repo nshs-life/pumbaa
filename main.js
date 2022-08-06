@@ -5,7 +5,7 @@ const { Client, Collection, ChannelType, GatewayIntentBits, Partials, EmbedBuild
 const { token } = require('./config.json');
 
 //create client
-const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildMessageReactions, GatewayIntentBits.DirectMessages, GatewayIntentBits.MessageContent], partials: [Partials.Channel, Partials.Message, Partials.Reaction] });
+const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildMessageReactions, GatewayIntentBits.DirectMessages, GatewayIntentBits.DirectMessageReactions, GatewayIntentBits.MessageContent], partials: [Partials.Channel, Partials.Message, Partials.Reaction] });
 
 //registering commands
 client.commands = new Collection();
@@ -125,9 +125,25 @@ client.on('messageReactionAdd', async (reaction, user) => {
 		}
 	}
 
-	const { guild } = reaction.message
+
+	let guild = client.guilds.cache.get('1004509586142806086')
 
 	if (user.bot == false) {
+
+		//dm reaction
+		if (reaction.message.guildId === null) {
+			if (reaction.emoji.name == '✅') {
+				user.send('Tutor confirmed')
+			} else {
+				user.send('Tutor cancelled. Please post another request to schedule a new tutor')
+			}
+
+			// guild.members.fetch(user.id)
+			// 	.then(member => {
+			// 		member.user.send('')
+			// 	})
+
+		}
 
 		//role-poll selection
 		if (reaction.message.channelId == '1005275051383345204') {
@@ -185,7 +201,10 @@ client.on('messageReactionAdd', async (reaction, user) => {
 						if (reaction.message.reactions.cache.get('✅').count == 2) {
 							reaction.message.react('➡')
 
-							member.user.send(user.username + ' accepted your tutor request')
+							member.user.send(user.username + ' accepted your tutor request. Confirm?').then(message => {
+								message.react('✅')
+								message.react('⛔')
+							})
 							user.send('Tutoring confirmation sent to ' + requestorName)
 
 
