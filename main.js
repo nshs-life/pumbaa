@@ -132,16 +132,27 @@ client.on('messageReactionAdd', async (reaction, user) => {
 
 		//dm reaction
 		if (reaction.message.guildId === null) {
+			
 			if (reaction.emoji.name == '✅') {
 				user.send('Tutor confirmed')
+				guild.members.fetch(reaction.message.embeds[0].footer.text)
+					.then(member => {
+						member.user.send(`${user.username} confirmed the tutoring session`)
+					})
 			} else {
 				user.send('Tutor cancelled. Please post another request to schedule a new tutor')
 			}
 
-			// guild.members.fetch(user.id)
-			// 	.then(member => {
-			// 		member.user.send('')
-			// 	})
+			//create thread for tutor and tutee
+			let channel = client.channels.cache.get('1005202136080068628')
+			channel.threads.create({
+				name: `Subject - ${reaction.message.embeds[0].fields[0].name.split(/Subject: /)[1]} | Tutor - ${reaction.message.embeds[0].title.split(/ accepted your tutor request/)[0]} | Tutee - ${user.username}`,
+				autoArchiveDuration: 10080,
+				type: ChannelType.GuildPublicThread
+			}).then(thread => {
+				thread.members.add(user.id)
+				thread.members.add(reaction.message.embeds[0].footer.text)
+			})
 
 		}
 
@@ -182,7 +193,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
 				.then(member => {
 					if (member.user.id == user.id) {
 						reaction.users.remove(user.id)
-						return user.send("This isn't a self-tutor system")
+						return user.send("Sorry, this isn't a self-tutor system")
 					} else {
 
 						const requestorName = reaction.message.embeds[0].description.split(/From: /)[1]
@@ -201,25 +212,23 @@ client.on('messageReactionAdd', async (reaction, user) => {
 						if (reaction.message.reactions.cache.get('✅').count == 2) {
 							reaction.message.react('➡')
 
-							member.user.send(user.username + ' accepted your tutor request. Confirm?').then(message => {
+							//send confirmation to tutee
+							const Embed = new EmbedBuilder()
+								.setTitle(user.username + ' accepted your tutor request.')
+								.setDescription('Estimated meeting length: ' + reaction.message.embeds[0].fields[1].value)
+								.setColor(0x0099FF)
+								.addFields(
+									{ name: reaction.message.embeds[0].fields[0].name, value: reaction.message.embeds[0].fields[0].value },
+									{ name: 'To confirm', value: 'React with ✅' },
+									{ name: 'To cancel', value: 'React with ⛔' })
+								.setTimestamp()
+								.setFooter({ text: user.id });
+
+							member.user.send({ embeds: [Embed] }).then(message => {
 								message.react('✅')
 								message.react('⛔')
 							})
 							user.send('Tutoring confirmation sent to ' + requestorName)
-
-
-							//create thread for tutor and tutee
-							let channel = client.channels.cache.get('1005202136080068628')
-							channel.threads.create({
-								name: `Subject - ${reaction.message.embeds[0].fields[0].name.split(/Subject: /)[1]} | Tutor - ${user.username} | Tutee - ${requestorName}`,
-								autoArchiveDuration: 10080,
-								type: ChannelType.GuildPublicThread
-							}).then(thread => {
-								thread.members.add(user.id)
-								thread.members.add(reaction.message.embeds[0].footer.text)
-							}
-
-							)
 
 
 						}
@@ -280,7 +289,6 @@ client.on('messageReactionRemove', async (reaction, user) => {
 	}
 
 })
-
 
 
 client.login(token);

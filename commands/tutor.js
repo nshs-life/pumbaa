@@ -43,8 +43,7 @@ module.exports = {
             .setColor(0x0099FF)
             .addFields(
                 { name: 'Subject: ' + subject, value: 'Details: ' + details },
-                { name: 'Estimated meeting time: ', value: time + ' minutes' },
-                { name: '\u200B', value: '\u200B' })
+                { name: 'Estimated meeting length: ', value: time + ' minutes' })
             .setTimestamp()
             .setFooter({ text: interaction.user.id });
 
