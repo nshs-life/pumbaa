@@ -5,7 +5,7 @@ const { Client, Collection, ChannelType, GatewayIntentBits, Partials, EmbedBuild
 const { token } = require('./config.json');
 
 //create client
-const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildMessageReactions, GatewayIntentBits.DirectMessages, GatewayIntentBits.MessageContent], partials: [Partials.Channel] });
+const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildMessageReactions, GatewayIntentBits.DirectMessages, GatewayIntentBits.MessageContent], partials: [Partials.Channel, Partials.Message, Partials.Reaction] });
 
 //registering commands
 client.commands = new Collection();
@@ -115,31 +115,124 @@ client.on('messageCreate', msg => {
 //reactions handler
 client.on('messageReactionAdd', async (reaction, user) => {
 
-	let guild = client.guilds.cache.get('1004509586142806086')
-
-	//tutor accept
-	if (reaction.emoji.name == '✅' && reaction.message.channelId == '1005048112890511450' && user.bot == false) {
-		const requestorName = reaction.message.embeds[0].description.split(/From: /)[1]
-
-		//send message to tutor and tutee
-		guild.members.fetch(reaction.message.embeds[0].footer.text)
-			.then(member => {
-				member.user.send(user.username + ' accepted your tutor request')
-				user.send('Tutoring confirmation sent to ' + requestorName)
-			})
-
-		//create thread for tutor and tutee
-		let channel = client.channels.cache.get('1005202136080068628')
-		const thread = await channel.threads.create({
-			name: `Subject - ${reaction.message.embeds[0].fields[0].name.split(/Subject: /)[1]} | Tutor - ${user.username} | Tutee - ${requestorName}`,
-			autoArchiveDuration: 10080,
-			type: ChannelType.GuildPublicThread
-		});
-
-		thread.members.add(user.id);
-		thread.members.add(reaction.message.embeds[0].footer.text);
-
+	// checks if the reaction is partial
+	if (reaction.partial) {
+		try {
+			await reaction.fetch(); //fetches reaction
+		} catch (error) {
+			console.error('Fetching message failed: ', error);
+			return;
+		}
 	}
+
+	const { guild } = reaction.message
+
+	if (user.bot == false) {
+
+		//role-poll selection
+		if (reaction.message.channelId == '1005275051383345204') {
+
+			//available tutor
+			if (reaction.emoji.name == '🚸') {
+				const role = guild.roles.cache.get('1005048288061444167')
+				guild.members.fetch(user.id)
+					.then(member => {
+						member.roles.add(role)
+					})
+			}
+
+			//opportunity pings
+			if (reaction.emoji.name == '🔎') {
+				const role = guild.roles.cache.get('1005371788349419560')
+				guild.members.fetch(user.id)
+					.then(member => {
+						member.roles.add(role)
+					})
+			}
+
+			//club pings
+			if (reaction.emoji.name == '♣') {
+				const role = guild.roles.cache.get('1005371922688778311')
+				guild.members.fetch(user.id)
+					.then(member => {
+						member.roles.add(role)
+					})
+			}
+
+			//accepting tutor request
+		} else if (reaction.message.channelId == '1005048112890511450' && reaction.emoji.name == '✅') {
+			const requestorName = reaction.message.embeds[0].description.split(/From: /)[1]
+
+			//send message to tutor and tutee
+			guild.members.fetch(reaction.message.embeds[0].footer.text)
+				.then(member => {
+					member.user.send(user.username + ' accepted your tutor request')
+					user.send('Tutoring confirmation sent to ' + requestorName)
+				})
+
+			//create thread for tutor and tutee
+			let channel = client.channels.cache.get('1005202136080068628')
+			const thread = await channel.threads.create({
+				name: `Subject - ${reaction.message.embeds[0].fields[0].name.split(/Subject: /)[1]} | Tutor - ${user.username} | Tutee - ${requestorName}`,
+				autoArchiveDuration: 10080,
+				type: ChannelType.GuildPublicThread
+			});
+
+			thread.members.add(user.id);
+			thread.members.add(reaction.message.embeds[0].footer.text);
+
+		}
+	}
+
+})
+
+//reactions handler
+client.on('messageReactionRemove', async (reaction, user) => {
+
+	// checks if the reaction is partial
+	if (reaction.partial) {
+		try {
+			await reaction.fetch(); //fetches reaction
+		} catch (error) {
+			console.error('Fetching message failed: ', error);
+			return;
+		}
+	}
+
+	const { guild } = reaction.message
+
+	//role-poll selection
+	if (user.bot == false && reaction.message.channelId == '1005275051383345204') {
+
+		//available tutor
+		if (reaction.emoji.name == '🚸') {
+
+			const role = guild.roles.cache.get('1005048288061444167')
+			guild.members.fetch(user.id)
+				.then(member => {
+					member.roles.remove(role)
+				})
+		}
+
+		//opportunity pings
+		if (reaction.emoji.name == '🔎') {
+			const role = guild.roles.cache.get('1005371788349419560')
+			guild.members.fetch(user.id)
+				.then(member => {
+					member.roles.remove(role)
+				})
+		}
+
+		//club pings
+		if (reaction.emoji.name == '♣') {
+			const role = guild.roles.cache.get('1005371922688778311')
+			guild.members.fetch(user.id)
+				.then(member => {
+					member.roles.remove(role)
+				})
+		}
+	}
+
 })
 
 
