@@ -161,26 +161,53 @@ client.on('messageReactionAdd', async (reaction, user) => {
 
 			//accepting tutor request
 		} else if (reaction.message.channelId == '1005048112890511450' && reaction.emoji.name == '✅') {
-			const requestorName = reaction.message.embeds[0].description.split(/From: /)[1]
 
-			//send message to tutor and tutee
 			guild.members.fetch(reaction.message.embeds[0].footer.text)
 				.then(member => {
-					member.user.send(user.username + ' accepted your tutor request')
-					user.send('Tutoring confirmation sent to ' + requestorName)
+					if (member.user.id == user.id) {
+						reaction.users.remove(user.id)
+						return user.send("This isn't a self-tutor system")
+					} else {
+
+						const requestorName = reaction.message.embeds[0].description.split(/From: /)[1]
+
+						let emojiCount = 0
+						reaction.message.reactions.cache.forEach((value, key) => {
+							emojiCount += value.count
+						});
+						if (emojiCount > 2) {
+							reaction.users.remove(user.id)
+							return user.send('Somebody already reached out to help ' + requestorName);
+						}
+
+
+						// someone accepts tutor request
+						if (reaction.message.reactions.cache.get('✅').count == 2) {
+							reaction.message.react('➡')
+
+							member.user.send(user.username + ' accepted your tutor request')
+							user.send('Tutoring confirmation sent to ' + requestorName)
+
+
+							//create thread for tutor and tutee
+							let channel = client.channels.cache.get('1005202136080068628')
+							channel.threads.create({
+								name: `Subject - ${reaction.message.embeds[0].fields[0].name.split(/Subject: /)[1]} | Tutor - ${user.username} | Tutee - ${requestorName}`,
+								autoArchiveDuration: 10080,
+								type: ChannelType.GuildPublicThread
+							}).then(thread => {
+								thread.members.add(user.id)
+								thread.members.add(reaction.message.embeds[0].footer.text)
+							}
+
+							)
+
+
+						}
+
+
+					}
 				})
-
-			//create thread for tutor and tutee
-			let channel = client.channels.cache.get('1005202136080068628')
-			const thread = await channel.threads.create({
-				name: `Subject - ${reaction.message.embeds[0].fields[0].name.split(/Subject: /)[1]} | Tutor - ${user.username} | Tutee - ${requestorName}`,
-				autoArchiveDuration: 10080,
-				type: ChannelType.GuildPublicThread
-			});
-
-			thread.members.add(user.id);
-			thread.members.add(reaction.message.embeds[0].footer.text);
-
 		}
 	}
 
