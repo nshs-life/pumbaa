@@ -3,6 +3,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { Client, Collection, ChannelType, GatewayIntentBits, Partials, EmbedBuilder } = require('discord.js');
 const { token } = require('./config.json');
+const keepAlive = require('./server')
 
 //create client
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildMessageReactions, GatewayIntentBits.DirectMessages, GatewayIntentBits.DirectMessageReactions, GatewayIntentBits.MessageContent], partials: [Partials.Channel, Partials.Message, Partials.Reaction] });
@@ -132,7 +133,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
 
 		//dm reaction
 		if (reaction.message.guildId === null) {
-			
+
 			if (reaction.emoji.name == '✅') {
 				user.send('Tutor confirmed')
 				guild.members.fetch(reaction.message.embeds[0].footer.text)
@@ -291,4 +292,5 @@ client.on('messageReactionRemove', async (reaction, user) => {
 })
 
 
+keepAlive()
 client.login(token);
