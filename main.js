@@ -214,6 +214,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
 			//dm reaction
 		} else if (reaction.message.guildId === null && reaction.count == 2) {
 
+			//tutor confirmation handling
 			if (reaction.emoji.name == '✅') {
 				user.send('Tutor confirmed')
 				guild.members.fetch(reaction.message.embeds[0].footer.text)
@@ -231,6 +232,11 @@ client.on('messageReactionAdd', async (reaction, user) => {
 					thread.members.add(user.id)
 					thread.members.add(reaction.message.embeds[0].footer.text)
 				})
+
+				reaction.message.channel.messages.fetch()
+					.then(messages => {
+						interaction.channel.bulkDelete(messages);
+					});
 			} else {
 				user.send('Tutor cancelled. Please post another request to schedule a new tutor')
 			}
