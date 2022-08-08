@@ -231,9 +231,10 @@ client.on('messageReactionAdd', async (reaction, user) => {
 				}).then(thread => {
 					thread.members.add(user.id)
 					thread.members.add(reaction.message.embeds[0].footer.text)
+
+					channel.bulkDelete(2)
 				})
 
-				channel.bulkDelete(2)
 			} else {
 				user.send('Tutor cancelled. Please post another request to schedule a new tutor')
 			}
