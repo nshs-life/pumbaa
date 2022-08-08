@@ -131,32 +131,6 @@ client.on('messageReactionAdd', async (reaction, user) => {
 
 	if (user.bot == false) {
 
-		//dm reaction
-		if (reaction.message.guildId === null) {
-
-			if (reaction.emoji.name == '✅') {
-				user.send('Tutor confirmed')
-				guild.members.fetch(reaction.message.embeds[0].footer.text)
-					.then(member => {
-						member.user.send(`${user.username} confirmed the tutoring session`)
-					})
-			} else {
-				user.send('Tutor cancelled. Please post another request to schedule a new tutor')
-			}
-
-			//create thread for tutor and tutee
-			let channel = client.channels.cache.get('1005202136080068628')
-			channel.threads.create({
-				name: `Subject - ${reaction.message.embeds[0].fields[0].name.split(/Subject: /)[1]} | Tutor - ${reaction.message.embeds[0].title.split(/ accepted your tutor request/)[0]} | Tutee - ${user.username}`,
-				autoArchiveDuration: 10080,
-				type: ChannelType.GuildPublicThread
-			}).then(thread => {
-				thread.members.add(user.id)
-				thread.members.add(reaction.message.embeds[0].footer.text)
-			})
-
-		}
-
 		//role-poll selection
 		if (reaction.message.channelId == '1005275051383345204') {
 
@@ -199,11 +173,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
 
 						const requestorName = reaction.message.embeds[0].description.split(/From: /)[1]
 
-						let emojiCount = 0
-						reaction.message.reactions.cache.forEach((value, key) => {
-							emojiCount += value.count
-						});
-						if (emojiCount > 2) {
+						if (reaction.count > 2) {
 							reaction.users.remove(user.id)
 							return user.send('Somebody already reached out to help ' + requestorName);
 						}
@@ -237,6 +207,33 @@ client.on('messageReactionAdd', async (reaction, user) => {
 
 					}
 				})
+
+			//dm reaction
+		} else if (reaction.message.guildId === null && reaction.count == 2) {
+
+			if (reaction.emoji.name == '✅') {
+				user.send('Tutor confirmed')
+				guild.members.fetch(reaction.message.embeds[0].footer.text)
+					.then(member => {
+						member.user.send(`${user.username} confirmed the tutoring session`)
+					})
+
+				//create thread for tutor and tutee
+				let channel = client.channels.cache.get('1005202136080068628')
+				channel.threads.create({
+					name: `Subject - ${reaction.message.embeds[0].fields[0].name.split(/Subject: /)[1]} | Tutor - ${reaction.message.embeds[0].title.split(/ accepted your tutor request/)[0]} | Tutee - ${user.username}`,
+					autoArchiveDuration: 10080,
+					type: ChannelType.GuildPublicThread
+				}).then(thread => {
+					thread.members.add(user.id)
+					thread.members.add(reaction.message.embeds[0].footer.text)
+				})
+			} else {
+				user.send('Tutor cancelled. Please post another request to schedule a new tutor')
+			}
+
+			reaction.message.delete()
+
 		}
 	}
 
