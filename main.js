@@ -173,7 +173,11 @@ client.on('messageReactionAdd', async (reaction, user) => {
 
 						const requestorName = reaction.message.embeds[0].description.split(/From: /)[1]
 
-						if (reaction.count > 2) {
+						let emojiCount = 0
+						reaction.message.reactions.cache.forEach((value, key) => {
+							emojiCount += value.count
+						});
+						if (emojiCount > 2) {
 							reaction.users.remove(user.id)
 							return user.send('Somebody already reached out to help ' + requestorName);
 						}
