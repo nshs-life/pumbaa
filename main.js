@@ -126,7 +126,6 @@ client.on('messageReactionAdd', async (reaction, user) => {
 		}
 	}
 
-
 	let guild = client.guilds.cache.get('1004509586142806086')
 
 	if (user.bot == false) {
