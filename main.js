@@ -186,23 +186,29 @@ client.on('messageReactionAdd', async (reaction, user) => {
 						if (reaction.message.reactions.cache.get('✅').count == 2) {
 							reaction.message.react('➡')
 
-							//send confirmation to tutee
-							const Embed = new EmbedBuilder()
-								.setTitle(user.username + ' accepted your tutor request.')
-								.setDescription('Estimated meeting length: ' + reaction.message.embeds[0].fields[1].value)
-								.setColor(0x0099FF)
-								.addFields(
-									{ name: reaction.message.embeds[0].fields[0].name, value: reaction.message.embeds[0].fields[0].value },
-									{ name: 'To confirm', value: 'React with ✅' },
-									{ name: 'To cancel', value: 'React with ⛔' })
-								.setTimestamp()
-								.setFooter({ text: user.id });
+							//get tutor's username
+							guild.members.fetch(user.id)
+								.then(tutor => {
 
-							member.user.send({ embeds: [Embed] }).then(message => {
-								message.react('✅')
-								message.react('⛔')
-							})
-							user.send('Tutoring confirmation sent to ' + requestorName)
+									//send confirmation to tutee
+									const Embed = new EmbedBuilder()
+										.setTitle(`${tutor.nickname ? tutor.nickname : user.username} accepted your tutor request.`)
+										.setDescription('Estimated meeting length: ' + reaction.message.embeds[0].fields[1].value)
+										.setColor(0x0099FF)
+										.addFields(
+											{ name: reaction.message.embeds[0].fields[0].name, value: reaction.message.embeds[0].fields[0].value },
+											{ name: 'To confirm', value: 'React with ✅' },
+											{ name: 'To cancel', value: 'React with ⛔' })
+										.setTimestamp()
+										.setFooter({ text: user.id });
+
+									member.user.send({ embeds: [Embed] }).then(message => {
+										message.react('✅')
+										message.react('⛔')
+									})
+									user.send('Tutoring confirmation sent to ' + requestorName)
+								})
+
 
 
 						}
@@ -216,27 +222,37 @@ client.on('messageReactionAdd', async (reaction, user) => {
 
 			//tutor confirmation handling
 			if (reaction.emoji.name == '✅') {
-				user.send('Tutor confirmed')
+				user.send('Tutoring session confirmed')
 				guild.members.fetch(reaction.message.embeds[0].footer.text)
 					.then(member => {
-						member.user.send(`${user.username} confirmed the tutoring session`)
+						guild.members.fetch(user.id)
+							.then(tutee => {
+								member.user.send(`${tutee.nickname ? tutee.nickname : user.username} confirmed the tutoring session`)
+							 })
+						
 					})
 
-				//create thread for tutor and tutee
-				let channel = client.channels.cache.get('1005202136080068628')
-				channel.threads.create({
-					name: `Subject - ${reaction.message.embeds[0].fields[0].name.split(/Subject: /)[1]} | Tutor - ${reaction.message.embeds[0].title.split(/ accepted your tutor request/)[0]} | Tutee - ${user.username}`,
-					autoArchiveDuration: 10080,
-					type: ChannelType.GuildPublicThread
-				}).then(thread => {
-					thread.members.add(user.id)
-					thread.members.add(reaction.message.embeds[0].footer.text)
+				guild.members.fetch(user.id)
+					.then(tutee => {
 
-					channel.bulkDelete(2)
-				})
+						//create thread for tutor and tutee
+						let channel = client.channels.cache.get('1005202136080068628')
+						channel.threads.create({
+							name: `Subject - ${reaction.message.embeds[0].fields[0].name.split(/Subject: /)[1]} | Tutor - ${reaction.message.embeds[0].title.split(/ accepted your tutor request/)[0]} | Tutee - ${tutee.nickname ? tutee.nickname : user.username}`,
+							autoArchiveDuration: 10080,
+							type: ChannelType.GuildPublicThread
+						}).then(thread => {
+							thread.members.add(user.id)
+							thread.members.add(reaction.message.embeds[0].footer.text)
+
+							channel.bulkDelete(2)
+						})
+					})
+
+
 
 			} else {
-				user.send('Tutor cancelled. Please post another request to schedule a new tutor')
+				user.send('Tutor cancelled. Please create another request to schedule a new tutor')
 			}
 
 			reaction.message.delete()

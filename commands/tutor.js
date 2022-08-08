@@ -39,7 +39,7 @@ module.exports = {
         //format embed
         const Embed = new EmbedBuilder()
             .setTitle('New Tutor Request')
-            .setDescription('From: ' + interaction.user.tag.split(/#/)[0])
+            .setDescription(`From: ${interaction.member.nickname ?  interaction.member.nickname : interaction.user.username}`)
             .setColor(0x0099FF)
             .addFields(
                 { name: 'Subject: ' + subject, value: 'Details: ' + details },
