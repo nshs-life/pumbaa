@@ -133,6 +133,15 @@ client.on('messageReactionAdd', async (reaction, user) => {
 		//role-poll selection
 		if (reaction.message.channelId == '1005275051383345204') {
 
+			//developer
+			if (reaction.emoji.name == '👩‍💻') {
+				const role = guild.roles.cache.get('1004509586142806089')
+				guild.members.fetch(user.id)
+					.then(member => {
+						member.roles.add(role)
+					})
+			}
+
 			//available tutor
 			if (reaction.emoji.name == '🚸') {
 				const role = guild.roles.cache.get('1005048288061444167')
@@ -280,6 +289,15 @@ client.on('messageReactionRemove', async (reaction, user) => {
 	//role-poll selection
 	if (user.bot == false && reaction.message.channelId == '1005275051383345204') {
 
+		//developer
+		if (reaction.emoji.name == '👩‍💻') {
+			const role = guild.roles.cache.get('1004509586142806089')
+			guild.members.fetch(user.id)
+				.then(member => {
+					member.roles.remove(role)
+				})
+		}
+
 		//available tutor
 		if (reaction.emoji.name == '🚸') {
 
@@ -307,6 +325,7 @@ client.on('messageReactionRemove', async (reaction, user) => {
 					member.roles.remove(role)
 				})
 		}
+
 	}
 
 })
