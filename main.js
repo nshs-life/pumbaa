@@ -105,14 +105,19 @@ client.on('messageCreate', msg => {
 
 					//already a member
 				} else {
-					setQuotes([])
 					fetch("https://type.fit/api/quotes")
 						.then(function (response) {
 							return response.json();
 						})
 						.then(function (data) {
-							setQuotes(data)
-							
+
+							const quote = data[Math.floor(Math.random() * data.length)]
+							const Embed = new EmbedBuilder()
+								.setTitle("Hello! Here's a quote for you to think about")
+								.setColor(0x18e1ee)
+								.addFields({ name: quote.text, value: '- ' + quote.author })
+							msg.channel.send({embeds: [Embed]})
+
 						});
 				}
 
