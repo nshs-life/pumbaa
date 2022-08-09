@@ -1,4 +1,5 @@
 //required classes
+const fetch = require('node-fetch');
 const fs = require('node:fs');
 const path = require('node:path');
 const { Client, Collection, ChannelType, GatewayIntentBits, Partials, EmbedBuilder } = require('discord.js');
@@ -104,7 +105,15 @@ client.on('messageCreate', msg => {
 
 					//already a member
 				} else {
-					msg.channel.send('hello!')
+					setQuotes([])
+					fetch("https://type.fit/api/quotes")
+						.then(function (response) {
+							return response.json();
+						})
+						.then(function (data) {
+							setQuotes(data)
+							
+						});
 				}
 
 			})
@@ -237,8 +246,8 @@ client.on('messageReactionAdd', async (reaction, user) => {
 						guild.members.fetch(user.id)
 							.then(tutee => {
 								member.user.send(`${tutee.nickname ? tutee.nickname : user.username} confirmed the tutoring session`)
-							 })
-						
+							})
+
 					})
 
 				guild.members.fetch(user.id)

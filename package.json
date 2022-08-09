@@ -12,6 +12,7 @@
     "@discordjs/rest": "^1.0.1",
     "discord.js": "^14.1.2",
     "express": "^4.18.1",
-    "googleapis": "^105.0.0"
+    "googleapis": "^105.0.0",
+    "node-fetch": "^2.6.7"
   }
 }
