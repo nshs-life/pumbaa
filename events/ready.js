@@ -5,7 +5,7 @@ module.exports = {
 	execute(client) {
 		console.log(`nshs.life.bot logged in as ${client.user.tag}`);
 
-		const Embed = new EmbedBuilder()
+		const roleEmbed = new EmbedBuilder()
 			.setTitle('Choosing optional server roles')
 			.setColor(0x0099FF)
 			.addFields(
@@ -20,7 +20,7 @@ module.exports = {
 			.then(msgs => {
 				if (msgs.size < 1) {
 					//post request to tutors
-					roleChannel.send({ embeds: [Embed] })
+					roleChannel.send({ embeds: [roleEmbed] })
 						.then(request => {
 							request.react('👩‍💻')
 							request.react('🚸')
@@ -30,5 +30,19 @@ module.exports = {
 				}
 			})
 
+		const aboutEmbed = new EmbedBuilder()
+			.setTitle('Our mission')
+			.setDescription('[mission.nshs.life](https://docs.google.com/document/u/5/d/e/2PACX-1vToUA9QApqWmo_k5YGaouh1-FexC5tqLzUIZv6fJZGneyBZwM_ImYNDzraq3mT5FzQVS_EGC7Kdk_Oj/pub)')
+			.setColor(0x0099FF);
+
+		let aboutChannel = client.channels.cache.get('1004509828879757393')
+
+		aboutChannel.messages.fetch()
+			.then(msgs => {
+				if (msgs.size < 1) {
+					//post request to tutors
+					aboutChannel.send({ embeds: [aboutEmbed] })
+				}
+			})
 	},
 };
