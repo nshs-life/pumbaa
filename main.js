@@ -2,7 +2,7 @@
 const fetch = require('node-fetch');
 const fs = require('node:fs');
 const path = require('node:path');
-const { Client, Collection, ChannelType, PermissionsBitField, GatewayIntentBits, Partials, EmbedBuilder } = require('discord.js');
+const { Client, Collection, ChannelType, GatewayIntentBits, Partials, EmbedBuilder } = require('discord.js');
 const { token } = require('./config.json');
 const keepAlive = require('./server')
 
