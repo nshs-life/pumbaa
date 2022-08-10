@@ -2,7 +2,7 @@
 const fetch = require('node-fetch');
 const fs = require('node:fs');
 const path = require('node:path');
-const { Client, Collection, ChannelType, GatewayIntentBits, Partials, EmbedBuilder } = require('discord.js');
+const { Client, Collection, ChannelType, PermissionsBitField, GatewayIntentBits, Partials, EmbedBuilder } = require('discord.js');
 const { token } = require('./config.json');
 const keepAlive = require('./server')
 
@@ -115,8 +115,8 @@ client.on('messageCreate', msg => {
 							const Embed = new EmbedBuilder()
 								.setTitle("Hello! Here's a quote for you to think about")
 								.setColor(0x18e1ee)
-								.addFields({ name: quote.text, value: `- ${quote.author ? quote.author : 'unknown'} `})
-							msg.channel.send({embeds: [Embed]})
+								.addFields({ name: quote.text, value: `- ${quote.author ? quote.author : 'unknown'} ` })
+							msg.channel.send({ embeds: [Embed] })
 
 						});
 				}
@@ -258,19 +258,20 @@ client.on('messageReactionAdd', async (reaction, user) => {
 				guild.members.fetch(user.id)
 					.then(tutee => {
 
-						//create thread for tutor and tutee
-						let channel = client.channels.cache.get('1005202136080068628')
-						channel.threads.create({
+						guild.channels.create({
 							name: `Subject - ${reaction.message.embeds[0].fields[0].name.split(/Subject: /)[1]} | Tutor - ${reaction.message.embeds[0].title.split(/ accepted your tutor request/)[0]} | Tutee - ${tutee.nickname ? tutee.nickname : user.username}`,
-							autoArchiveDuration: 10080,
-							type: ChannelType.GuildPublicThread
-						}).then(thread => {
-							thread.members.add(user.id)
-							thread.members.add(reaction.message.embeds[0].footer.text)
+							type: ChannelType.GuildVoice,
+						}).then(channel => {
+							let category = guild.channels.cache.get('1005208881024217181');
+							channel.setParent(category.id);
+							channel.permissionOverwrites.edit(guild.id, { ViewChannel: false });
+							channel.permissionOverwrites.edit(user.id, { ViewChannel: true });
+							channel.permissionOverwrites.edit(reaction.message.embeds[0].footer.text, { ViewChannel: true });
+						});
 
-							channel.bulkDelete(2)
-						})
 					})
+
+
 
 
 
