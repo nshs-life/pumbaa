@@ -115,7 +115,7 @@ client.on('messageCreate', msg => {
 							const Embed = new EmbedBuilder()
 								.setTitle("Hello! Here's a quote for you to think about")
 								.setColor(0x18e1ee)
-								.addFields({ name: quote.text, value: '- ' + quote.author })
+								.addFields({ name: quote.text, value: `- ${quote.author ? quote.author : 'unknown'} `})
 							msg.channel.send({embeds: [Embed]})
 
 						});
