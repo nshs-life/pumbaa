@@ -4,10 +4,12 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { Client, Collection, ChannelType, GatewayIntentBits, Partials, EmbedBuilder } = require('discord.js');
 const { token } = require('./config.json');
-const keepAlive = require('./server')
+const keepAlive = require('./server');
+const e = require('express');
+const { channel } = require('node:diagnostics_channel');
 
 //create client
-const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildMessageReactions, GatewayIntentBits.DirectMessages, GatewayIntentBits.DirectMessageReactions, GatewayIntentBits.MessageContent], partials: [Partials.Channel, Partials.Message, Partials.Reaction] });
+const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildMessageReactions, GatewayIntentBits.DirectMessages, GatewayIntentBits.DirectMessageReactions, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildVoiceStates], partials: [Partials.Channel, Partials.Message, Partials.Reaction] });
 
 //registering commands
 client.commands = new Collection();
@@ -258,15 +260,31 @@ client.on('messageReactionAdd', async (reaction, user) => {
 				guild.members.fetch(user.id)
 					.then(tutee => {
 
+						//voice channel for tutor and tutee
 						guild.channels.create({
-							name: `Subject - ${reaction.message.embeds[0].fields[0].name.split(/Subject: /)[1]} | Tutor - ${reaction.message.embeds[0].title.split(/ accepted your tutor request/)[0]} | Tutee - ${tutee.nickname ? tutee.nickname : user.username}`,
+							name: `Tutor - ${reaction.message.embeds[0].title.split(/ accepted your tutor request/)[0]} | Tutee - ${tutee.nickname ? tutee.nickname : user.username}`,
 							type: ChannelType.GuildVoice,
 						}).then(channel => {
+
+							//add vc to tutoring category and make it visible to only the tutor and tutee 
 							let category = guild.channels.cache.get('1005208881024217181');
 							channel.setParent(category.id);
 							channel.permissionOverwrites.edit(guild.id, { ViewChannel: false });
 							channel.permissionOverwrites.edit(user.id, { ViewChannel: true });
 							channel.permissionOverwrites.edit(reaction.message.embeds[0].footer.text, { ViewChannel: true });
+
+							//meeting details so ids can be pulled later to log tutor hours
+							const Embed = new EmbedBuilder()
+								.setTitle(`Meeting Details`)
+								.setColor(0x0099FF)
+								.addFields(
+									{ name: reaction.message.embeds[0].fields[0].name, value: reaction.message.embeds[0].fields[0].value },
+									{ name: 'Estimated meeting length', value: reaction.message.embeds[0].description.split(/Estimated meeting length: /)[1] },
+									{ name: 'Tutor ID', value: reaction.message.embeds[0].footer.text },
+									{ name: 'Tutee ID', value: user.id });
+
+
+							channel.send({ embeds: [Embed] })
 						});
 
 					})
@@ -345,6 +363,46 @@ client.on('messageReactionRemove', async (reaction, user) => {
 
 })
 
+
+client.on('voiceStateUpdate', async (oldState, newState) => {
+
+	let guild = client.guilds.cache.get('1004509586142806086')
+
+	if (newState.channel !== null) {
+
+		//get first message (the bot's embed)
+		const fetchedMsg = await newState.channel.messages.fetch({ after: 1, limit: 1 })
+		const firstMsg = fetchedMsg.first()
+
+		//when the people in the vc are the tutor and tutee, start the session
+		const memberIds = Array.from(newState.channel.members.keys())
+		if (memberIds.length == 2 && memberIds.includes(firstMsg.embeds[0].fields[2].value) && memberIds.includes(firstMsg.embeds[0].fields[3].value)) {
+
+			console.log('tutor session started')
+		}
+
+	} else if (newState.channel === null) {
+
+		//get first message (the bot's embed)
+		const fetchedMsg = await oldState.channel.messages.fetch({ after: 1, limit: 1 })
+		const firstMsg = fetchedMsg.first()
+
+		//possible people allowed
+		const memberIds = [firstMsg.embeds[0].fields[2].value, firstMsg.embeds[0].fields[3].value]
+		//whoever's left (tutee/tutor)
+		const personLeft = Array.from(oldState.channel.members.keys())
+		if (personLeft.length == 1 && memberIds.includes(oldState.id) && memberIds.includes(personLeft[0])) {
+			guild.channels.fetch(oldState.channelId).then( channel => {
+				channel.send('@everyone. This tutor session has ended. The channel will be deleted in 5 minutes')
+				setTimeout(function(){channel.delete()}, 300000)
+			})
+			
+		}
+	}
+
+
+
+})
 
 keepAlive()
 client.login(token);
