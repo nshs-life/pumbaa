@@ -5,8 +5,75 @@ const path = require('node:path');
 const { Client, Collection, ChannelType, GatewayIntentBits, Partials, EmbedBuilder } = require('discord.js');
 const { token } = require('./config.json');
 const keepAlive = require('./server');
+const http = require('http');
+const url = require('url');
+const opn = require('open');
+const destroyer = require('server-destroy');
 
-//create client
+const { google } = require('googleapis');
+const people = google.people('v1');
+const { googleId, googleSecret, redirUri } = require('./config.json')
+
+
+/**
+ * Create a new OAuth2 client with the configured keys.
+ */
+const oauth2Client = new google.auth.OAuth2(
+	googleId,
+	googleSecret,
+	redirUri
+);
+
+google.options({ auth: oauth2Client });
+
+/**
+ * Open an http server to accept the oauth callback.
+ */
+async function authenticate(scopes) {
+	return new Promise((resolve, reject) => {
+		// grab the url that will be used for authorization
+		const authorizeUrl = oauth2Client.generateAuthUrl({
+			access_type: 'offline',
+			scope: scopes.join(' '),
+		});
+		const server = http
+			.createServer(async (req, res) => {
+				try {
+					if (req.url.indexOf('/oauth2callback') > -1) {
+						const qs = new url.URL(req.url, 'http://localhost:4000')
+							.searchParams;
+						res.end('Authentication successful! Please return to the console.');
+						server.destroy();
+						const { tokens } = await oauth2Client.getToken(qs.get('code'));
+						oauth2Client.credentials = tokens; // eslint-disable-line require-atomic-updates
+						resolve(oauth2Client);
+					}
+				} catch (e) {
+					reject(e);
+				}
+			})
+			.listen(4000, () => {
+				// open the browser to the authorize url to start the workflow
+				opn(authorizeUrl, { wait: false }).then(cp => cp.unref());
+			});
+		destroyer(server);
+	});
+}
+
+async function getGoogleAccInfo() {
+	// retrieve user profile
+	const res = await people.people.get({
+		resourceName: 'people/me',
+		personFields: 'names,emailAddresses',
+	});
+
+	return [res.data.emailAddresses[0].value, res.data.names[0].displayName]
+}
+
+
+/**
+ * Create discord client
+ */
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildMessageReactions, GatewayIntentBits.DirectMessages, GatewayIntentBits.DirectMessageReactions, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildVoiceStates], partials: [Partials.Channel, Partials.Message, Partials.Reaction] });
 
 //registering commands
@@ -94,29 +161,49 @@ client.on('messageCreate', msg => {
 					/* also need them to enter full name */
 					if (msg.content.match(/\d{9}@newton.k12.ma.us/)) {
 
-						// // add grade, remove new member
-						// member.roles.add(guild.roles.cache.get('1004509586142806093'))
-						// member.roles.remove(guild.roles.cache.get('1004509586142806087'))
+						const scopes = [
+							'https://www.googleapis.com/auth/user.emails.read',
+							'profile'
+						];
 
-						const gradeEmbed = new EmbedBuilder()
-							.setTitle('Please select your grade')
-							.setColor(0x0099FF)
-							.addFields(
-								{ name: 'Freshman', value: 'React with 🕘' },
-								{ name: 'Sophomore', value: 'React with 🕙' },
-								{ name: 'Junior', value: 'React with 🕚' },
-								{ name: 'Senior', value: 'React with 🕛' });
+						authenticate(scopes)
+							.then(googleAccount => getGoogleAccInfo(googleAccount)
+								.then(accInfo => {
 
-						msg.channel.send({ embeds: [gradeEmbed] })
-							.then(request => {
-								request.react('🕘')
-								request.react('🕙')
-								request.react('🕚')
-								request.react('🕛')
-							})
+									//user has to select a newton email to join
+									if (accInfo[0].match(/\d{9}@newton.k12.ma.us/)) {
+										member.setNickname(accInfo[1])
+										const gradeEmbed = new EmbedBuilder()
+											.setTitle('Please select your grade')
+											.setColor(0x0099FF)
+											.addFields(
+												{ name: 'Freshman', value: 'React with 🕘' },
+												{ name: 'Sophomore', value: 'React with 🕙' },
+												{ name: 'Junior', value: 'React with 🕚' },
+												{ name: 'Senior', value: 'React with 🕛' });
+
+										msg.channel.send({ embeds: [gradeEmbed] })
+											.then(request => {
+												request.react('🕘')
+												request.react('🕙')
+												request.react('🕚')
+												request.react('🕛')
+											})
+									} else {
+										const failEmbed = new EmbedBuilder()
+											.setTitle('You have to select an nps email, please try again')
+										msg.channel.send({ embeds: [failEmbed] })
+									}
+								})
+							)
+
+
+
 
 					} else {
-						msg.channel.send("Please enter your school email to join the server")
+						const loginReqEmbed = new EmbedBuilder()
+							.setTitle('Please type out your nps email')
+						msg.channel.send({ embeds: [loginReqEmbed] })
 					}
 
 					//already a member
