@@ -2,3 +2,4 @@ config.json
 /node_modules
 nshs.life.bot.extra.js
 .venv
+__pycache__
