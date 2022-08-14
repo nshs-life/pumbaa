@@ -1,0 +1,15 @@
+LICENSE
+README.rst
+setup.cfg
+setup.py
+schoolopy/__init__.py
+schoolopy/authentication.py
+schoolopy/errors.py
+schoolopy/main.py
+schoolopy/models.py
+schoolopy.egg-info/PKG-INFO
+schoolopy.egg-info/SOURCES.txt
+schoolopy.egg-info/dependency_links.txt
+schoolopy.egg-info/not-zip-safe
+schoolopy.egg-info/requires.txt
+schoolopy.egg-info/top_level.txt
