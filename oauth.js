@@ -35,7 +35,7 @@ async function authenticate(scopes) {
             .createServer(async (req, res) => {
                 try {
                     if (req.url.indexOf('/oauth2callback') > -1) {
-                        const qs = new url.URL(req.url, 'http://localhost:3000')
+                        const qs = new url.URL(req.url, 'http://localhost:4000')
                             .searchParams;
                         res.end('Authentication successful! Please return to the console.');
                         server.destroy();
@@ -47,7 +47,7 @@ async function authenticate(scopes) {
                     reject(e);
                 }
             })
-            .listen(3000, () => {
+            .listen(4000, () => {
                 // open the browser to the authorize url to start the workflow
                 opn(authorizeUrl, { wait: false }).then(cp => cp.unref());
             });
@@ -59,13 +59,15 @@ async function runSample() {
     // retrieve user profile
     const res = await people.people.get({
         resourceName: 'people/me',
-        personFields: 'emailAddresses',
+        personFields: 'names,emailAddresses',
     });
-    console.log(res.data);
+    console.log(res.data.emailAddresses[0].value)
+    console.log(res.data.names[0].displayName);
 }
 
 const scopes = [
-    'profile',
+    'https://www.googleapis.com/auth/user.emails.read',
+    'profile'
 ];
 authenticate(scopes)
     .then(client => runSample(client))
