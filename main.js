@@ -5,7 +5,6 @@ const path = require('node:path');
 const { Client, Collection, ChannelType, GatewayIntentBits, Partials, EmbedBuilder } = require('discord.js');
 const { token } = require('./config.json');
 const keepAlive = require('./server');
-const e = require('express');
 const { channel } = require('node:diagnostics_channel');
 
 //create client
@@ -36,7 +35,6 @@ for (const file of eventFiles) {
 		client.on(event.name, (...args) => event.execute(...args));
 	}
 }
-
 
 //user commands handler
 client.on('interactionCreate', async interaction => {
@@ -96,6 +94,7 @@ client.on('messageCreate', msg => {
 
 					/* also need them to enter full name */
 					if (msg.content.match(/\d{9}@newton.k12.ma.us/)) {
+						
 						// add grade, remove new member
 						member.roles.add(guild.roles.cache.get('1004509586142806093'))
 						member.roles.remove(guild.roles.cache.get('1004509586142806087'))
