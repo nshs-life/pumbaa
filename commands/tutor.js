@@ -51,7 +51,7 @@ module.exports = {
         interaction.guild.channels.fetch('1005048112890511450')
             .then(channel => channel.send({ embeds: [Embed] })
                 .then(request => {
-                    request.react("✅")
+                    request.react("🎓")
                 })
             )
 
