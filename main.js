@@ -273,14 +273,12 @@ client.on('messageReactionAdd', async (reaction, user) => {
 						if (reaction.emoji.name == '🕘') {
 							const role = guild.roles.cache.get('1004509586142806091')
 							member.roles.add(role)
-
 						}
 
 						//sophomore
 						if (reaction.emoji.name == '🕙') {
 							const role = guild.roles.cache.get('1004509586142806092')
 							member.roles.add(role)
-
 						}
 
 						//junior
