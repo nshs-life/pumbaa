@@ -1,9 +1,11 @@
-const { EmbedBuilder } = require('discord.js');
+const { ActivityType, EmbedBuilder } = require('discord.js');
 module.exports = {
 	name: 'ready',
 	once: true,
 	execute(client) {
 		console.log(`nshs.life.bot logged in as ${client.user.tag}`);
+
+		client.user.setActivity('/help', { type: ActivityType.Watching });
 
 		const roleEmbed = new EmbedBuilder()
 			.setTitle('Choosing optional server roles')
