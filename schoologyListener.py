@@ -35,15 +35,16 @@ def main():
 
     start_time = time.perf_counter()
 
-    data = SchoologyData(oauth_url=schoology.request_authorization())
+    data = SchoologyData(oauth_url=schoology.request_authorization(), start=True)
 
     sys.stdout.write(data.json())
     sys.stdout.flush()
 
-    while not schoology.authorize() and start_time - time.perf_counter() < TIMEOUT:
-        time.sleep(1)
+    while not schoology.authorize() and time.perf_counter() - start_time < TIMEOUT:
+        time.sleep(.1)
     
-    if start_time - time.perf_counter() >= TIMEOUT:
+
+    if time.perf_counter() - start_time >= TIMEOUT:
         data.timeout = True
         sys.stderr.write(data.json())
         sys.stderr.flush()

@@ -14,6 +14,7 @@ const { google } = require('googleapis');
 const people = google.people('v1');
 const { googleId, googleSecret, redirUri } = require('./config.json')
 
+const { SchoologyAuthenticate } = require('./schoologyListener.js');
 
 /**
  * Create a new OAuth2 client with the configured keys.
@@ -152,60 +153,45 @@ client.on('messageCreate', msg => {
 		//add specific grade role to member
 		guild.members.fetch(msg.author.id)
 			.then(member => {
-
 				//new member
 				if (member.roles.cache.has('1004509586142806087')) {
 
 					//regex school email
-
 					/* also need them to enter full name */
 					if (msg.content.match(/\d{9}@newton.k12.ma.us/)) {
+                        SchoologyAuthenticate(msg)
+                            .then(displayName => {
+                                //user has to select a newton email to join
+                                member.setNickname(displayName)
+                                const gradeEmbed = new EmbedBuilder()
+                                    .setTitle('Please select your grade')
+                                    .setColor(0x0099FF)
+                                    .addFields(
+                                        { name: 'Freshman', value: 'React with 🕘' },
+                                        { name: 'Sophomore', value: 'React with 🕙' },
+                                        { name: 'Junior', value: 'React with 🕚' },
+                                        { name: 'Senior', value: 'React with 🕛' });
 
-						const scopes = [
-							'https://www.googleapis.com/auth/user.emails.read',
-							'profile'
-						];
-
-						authenticate(scopes)
-							.then(googleAccount => getGoogleAccInfo(googleAccount)
-								.then(accInfo => {
-
-									//user has to select a newton email to join
-									if (accInfo[0].match(/\d{9}@newton.k12.ma.us/)) {
-										member.setNickname(accInfo[1])
-										const gradeEmbed = new EmbedBuilder()
-											.setTitle('Please select your grade')
-											.setColor(0x0099FF)
-											.addFields(
-												{ name: 'Freshman', value: 'React with 🕘' },
-												{ name: 'Sophomore', value: 'React with 🕙' },
-												{ name: 'Junior', value: 'React with 🕚' },
-												{ name: 'Senior', value: 'React with 🕛' });
-
-										msg.channel.send({ embeds: [gradeEmbed] })
-											.then(request => {
-												request.react('🕘')
-												request.react('🕙')
-												request.react('🕚')
-												request.react('🕛')
-											})
-									} else {
-										const failEmbed = new EmbedBuilder()
-											.setTitle('You have to select an nps email, please try again')
-										msg.channel.send({ embeds: [failEmbed] })
-									}
-								})
-							)
-
-
-
-
+                                msg.channel.send({ embeds: [gradeEmbed] })
+                                    .then(request => {
+                                        request.react('🕘')
+                                        request.react('🕙')
+                                        request.react('🕚')
+                                        request.react('🕛')
+                                    })
+                                })
+                            .catch(err => {
+                                const errorEmbed = new EmbedBuilder()
+                                    .setTitle('Error')
+                                    .setColor(0xFF0000)
+                                    .setDescription('Schoology authentication timed out. Please try again.')
+                                msg.channel.send({ embeds: [errorEmbed] })
+                            })
 					} else {
 						const loginReqEmbed = new EmbedBuilder()
 							.setTitle('Please type out your nps email')
 						msg.channel.send({ embeds: [loginReqEmbed] })
 					}
-
 					//already a member
 				} else {
 					fetch("https://type.fit/api/quotes")
