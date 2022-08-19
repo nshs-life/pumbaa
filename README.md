@@ -12,7 +12,7 @@ Simba:
 - Coordinates tutoring sessions
 
 ## How do I use Simba?
-Using Simba is easy! Type ```\help``` in the nshs.life server and he'll give you a list of commands.
+Using Simba is easy! Type ```/help``` in the nshs.life server and he'll give you a list of commands.
 
 ## How do I contribute?
 Everyone is welcome to contribute to Simba! If you have any ideas for new features, please open an issue. If you want to contribute code, please open a pull request and we'll review it and merge.
