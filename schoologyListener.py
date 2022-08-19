@@ -51,6 +51,7 @@ def main():
         sys.exit(1)
     
     if schoology.authorize():
+        data.start = False
         data.authorization = True
         data.display_name = schoolopy.Schoology(schoology).get_me().name_display
         sys.stdout.write(data.json())

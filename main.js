@@ -25,52 +25,6 @@ const oauth2Client = new google.auth.OAuth2(
 	redirUri
 );
 
-google.options({ auth: oauth2Client });
-
-/**
- * Open an http server to accept the oauth callback.
- */
-async function authenticate(scopes) {
-	return new Promise((resolve, reject) => {
-		// grab the url that will be used for authorization
-		const authorizeUrl = oauth2Client.generateAuthUrl({
-			access_type: 'offline',
-			scope: scopes.join(' '),
-		});
-		const server = http
-			.createServer(async (req, res) => {
-				try {
-					if (req.url.indexOf('/oauth2callback') > -1) {
-						const qs = new url.URL(req.url, 'http://localhost:4000')
-							.searchParams;
-						res.end('Authentication successful! Please return to the console.');
-						server.destroy();
-						const { tokens } = await oauth2Client.getToken(qs.get('code'));
-						oauth2Client.credentials = tokens; // eslint-disable-line require-atomic-updates
-						resolve(oauth2Client);
-					}
-				} catch (e) {
-					reject(e);
-				}
-			})
-			.listen(4000, () => {
-				// open the browser to the authorize url to start the workflow
-				opn(authorizeUrl, { wait: false }).then(cp => cp.unref());
-			});
-		destroyer(server);
-	});
-}
-
-async function getGoogleAccInfo() {
-	// retrieve user profile
-	const res = await people.people.get({
-		resourceName: 'people/me',
-		personFields: 'names,emailAddresses',
-	});
-
-	return [res.data.emailAddresses[0].value, res.data.names[0].displayName]
-}
-
 
 /**
  * Create discord client
@@ -133,7 +87,7 @@ client.on('guildMemberAdd', member => {
 	const Embed = new EmbedBuilder()
 		.setThumbnail(client.user.displayAvatarURL())
 		.setTitle('Welcome to nshs.life!')
-		.setColor(0x18e1ee)
+		.setColor("#0e3675")
 		.addFields({ name: 'Our Mission', value: '[mission.nshs.life](https://docs.google.com/document/u/5/d/e/2PACX-1vToUA9QApqWmo_k5YGaouh1-FexC5tqLzUIZv6fJZGneyBZwM_ImYNDzraq3mT5FzQVS_EGC7Kdk_Oj/pub)' })
 		.addFields({ name: 'Join Requirement', value: 'Please type out your school email' });
 
@@ -182,9 +136,9 @@ client.on('messageCreate', msg => {
                                 })
                             .catch(err => {
                                 const errorEmbed = new EmbedBuilder()
-                                    .setTitle('Error')
+                                    .setTitle('Verification Timed Out')
                                     .setColor(0xFF0000)
-                                    .setDescription('Schoology authentication timed out. Please try again.')
+                                    .setDescription('Schoology authentication timed out. Send your school email again to re-verify.')
                                 msg.channel.send({ embeds: [errorEmbed] })
                             })
 					} else {
@@ -203,11 +157,18 @@ client.on('messageCreate', msg => {
 							const quote = data[Math.floor(Math.random() * data.length)]
 							const Embed = new EmbedBuilder()
 								.setTitle("Hello! Here's a quote for you to think about")
-								.setColor(0x18e1ee)
+								.setColor("#0e3675")
 								.addFields({ name: quote.text, value: `- ${quote.author ? quote.author : 'unknown'} ` })
 							msg.channel.send({ embeds: [Embed] })
 
-						});
+						})
+                        .catch(err => {
+                            const errorEmbed = new EmbedBuilder()
+                                .setTitle("You're already a member!")
+                                .setColor("#14499c")
+                                .setDescription("You've already authenticated. If you're having trouble, please contact a moderator.")
+                            msg.channel.send({ embeds: [errorEmbed] })
+                        });
 				}
 
 			})
@@ -367,7 +328,11 @@ client.on('messageReactionAdd', async (reaction, user) => {
 					})
 
 				const welcome = new EmbedBuilder()
-					.setTitle(`You can check out the server now!`);
+                    .setColor(0x00AE86)
+                    .setTitle('Welcome to nshs.life!')
+                    .setDescription('You can check out the server now!')
+                    .addFields(
+                        { name: 'Rules', value: '[rules.nshs.life](https://rules.nshs.life)' });
 				user.send({ embeds: [welcome] })
 				reaction.message.delete()
 			}
