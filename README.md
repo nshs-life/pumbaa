@@ -1,4 +1,5 @@
 # Simba
+![](https://images.news18.com/ibnlive/uploads/2018/11/lion-king.jpg)
 Covering the needs of the nshs.life server.
 
 ## What does Simba do?
