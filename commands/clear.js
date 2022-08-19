@@ -16,7 +16,7 @@ module.exports = {
 
 		await interaction.channel.messages.fetch({ limit: integer })
 			.then(messages => {
-				interaction.channel.bulkDelete(messages);
+				interaction.channel.bulkDelete(messages, true);
 			});
 
 		await interaction.reply({ content: 'cleared', ephemeral: true })
