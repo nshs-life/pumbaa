@@ -3,28 +3,15 @@ const fetch = require('node-fetch');
 const fs = require('node:fs');
 const path = require('node:path');
 const { Client, Collection, ChannelType, GatewayIntentBits, Partials, EmbedBuilder } = require('discord.js');
-const { token } = require('./config.json');
 const keepAlive = require('./server');
-const http = require('http');
-const url = require('url');
-const opn = require('open');
-const destroyer = require('server-destroy');
-
-const { google } = require('googleapis');
-const people = google.people('v1');
-const { googleId, googleSecret, redirUri } = require('./config.json')
 
 const { SchoologyAuthenticate } = require('./schoologyListener.js');
 
-/**
- * Create a new OAuth2 client with the configured keys.
- */
-const oauth2Client = new google.auth.OAuth2(
-	googleId,
-	googleSecret,
-	redirUri
-);
-
+if (fs.existsSync("./config.json")) {
+    var { token } = require('./config.json');
+} else {
+    var { token } = process.env;
+}
 
 /**
  * Create discord client
@@ -157,7 +144,7 @@ client.on('messageCreate', msg => {
 							const quote = data[Math.floor(Math.random() * data.length)]
 							const Embed = new EmbedBuilder()
 								.setTitle("Hello! Here's a quote for you to think about")
-								.setColor("#0e3675")
+								.setColor("#14499c")
 								.addFields({ name: quote.text, value: `- ${quote.author ? quote.author : 'unknown'} ` })
 							msg.channel.send({ embeds: [Embed] })
 

@@ -1,7 +1,12 @@
-const { schoologyKey, schoologySecret } = require('./config.json');
+const fs = require('node:fs');
 const { spawn } = require("child_process");
 const { EmbedBuilder } = require('discord.js');
-const { url } = require('inspector');
+
+if (fs.existsSync("./config.json")) {
+    var { schoologyKey, schoologySecret } = require('./config.json');
+} else {
+    var { schoologyKey, schoologySecret } = process.env;
+}
 
 module.exports = {
     SchoologyAuthenticate: async function (msg) {
@@ -21,7 +26,7 @@ module.exports = {
                         
                         .setAuthor({ name: 'Schoology', iconURL: 'https://images-na.ssl-images-amazon.com/images/I/51b+eOYTduL.png', url: oauth_url })
                         .setTitle("User Verification")
-		                .setColor(0e3675)
+		                .setColor("#14499c")
                         .setDescription("Click the link below to verify yourself with Schoology")
                         .addFields({ name: "Verify Here:", value: `[Schoology OAuth](${oauth_url})` })
                         msg.channel.send( { embeds: [OAuthEmbed] } );
