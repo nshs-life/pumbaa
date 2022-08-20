@@ -68,7 +68,7 @@ client.on('guildMemberAdd', member => {
 
 	//pinging in welcome channel
 	const channel = member.guild.channels.cache.find(channel => channel.name === "welcome");
-	channel.send(`Welcome to nshs.life, ${member}, please check your DMs for steps to join!`)
+	channel.send(`Hakuna Matata! Welcome to nshs.life, ${member}, please check your DMs for steps to join!`)
 
 	//DMing new member
 	const Embed = new EmbedBuilder()
@@ -76,6 +76,8 @@ client.on('guildMemberAdd', member => {
 		.setTitle('Welcome to nshs.life!')
 		.setColor("#0e3675")
 		.addFields({ name: 'Our Mission', value: '[mission.nshs.life](https://docs.google.com/document/u/5/d/e/2PACX-1vToUA9QApqWmo_k5YGaouh1-FexC5tqLzUIZv6fJZGneyBZwM_ImYNDzraq3mT5FzQVS_EGC7Kdk_Oj/pub)' })
+		.addFields({ name: 'Our Rules', value: '[rules.nshs.life](https://docs.google.com/document/u/5/d/e/2PACX-1vSJ1NB4b7RmcOWPEiDMXVQtug1nHvnzwaSjTvEBq_keDMVgDrut2aZxN6uGD8ccL8xMnvWFXIS8PT09/pub)' })
+
 		.addFields({ name: 'Join Requirement', value: 'Please type out your school email' });
 
 	member.send({ embeds: [Embed] })
