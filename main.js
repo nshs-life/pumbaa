@@ -104,24 +104,29 @@ client.on('messageCreate', msg => {
 					if (msg.content.match(/\d{9}@newton.k12.ma.us/)) {
                         SchoologyAuthenticate(msg)
                             .then(displayName => {
+				
                                 //user has to select a newton email to join
                                 member.setNickname(displayName)
-                                const gradeEmbed = new EmbedBuilder()
-                                    .setTitle('Please select your grade')
-                                    .setColor(0x0099FF)
-                                    .addFields(
-                                        { name: 'Freshman', value: 'React with 🕘' },
-                                        { name: 'Sophomore', value: 'React with 🕙' },
-                                        { name: 'Junior', value: 'React with 🕚' },
-                                        { name: 'Senior', value: 'React with 🕛' });
+				
+				//make sure they don't have a grade role already
+				if (!member.roles.cache.has('1004509586142806094') && !member.roles.cache.has('1004509586142806093') && !member.roles.cache.has('1004509586142806092') && !member.roles.cache.has('1004509586142806091')) {
+					const gradeEmbed = new EmbedBuilder()
+					    .setTitle('Please select your grade')
+					    .setColor(0x0099FF)
+					    .addFields(
+						{ name: 'Freshman', value: 'React with 🕘' },
+						{ name: 'Sophomore', value: 'React with 🕙' },
+						{ name: 'Junior', value: 'React with 🕚' },
+						{ name: 'Senior', value: 'React with 🕛' });
 
-                                msg.channel.send({ embeds: [gradeEmbed] })
-                                    .then(request => {
-                                        request.react('🕘')
-                                        request.react('🕙')
-                                        request.react('🕚')
-                                        request.react('🕛')
-                                    })
+					msg.channel.send({ embeds: [gradeEmbed] })
+					    .then(request => {
+						request.react('🕘')
+						request.react('🕙')
+						request.react('🕚')
+						request.react('🕛')
+					    })
+				}
                                 })
                             .catch(err => {
                                 const errorEmbed = new EmbedBuilder()
