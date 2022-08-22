@@ -1,4 +1,5 @@
 const { ActivityType, EmbedBuilder } = require('discord.js');
+const CronJob = require('cron').CronJob;
 module.exports = {
 	name: 'ready',
 	once: true,
