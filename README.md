@@ -1,6 +1,13 @@
 # Pumbaa
 ![](https://static.wikia.nocookie.net/disney/images/f/f8/Lion-king-disneyscreencaps.com-5210.jpg/revision/latest?cb=20210525065410)
-Hakuna Matata! Covering the needs of the nshs.life community.
+
+<h2 align="center" style="font-weight: bold;">
+Hakuna Matata!
+</h2>
+
+<h3 align="center">
+Covering the needs of the <a href="http://nshs.life/">nshs.life</a> community.
+</h3>
 
 ## What does Pumbaa do?
 Pumbaa is a discord bot for the nshs.life server. Powered by the ```discord.js``` library, Pumbaa is a multipurpose bot that can do a variety of things.
