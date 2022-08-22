@@ -27,7 +27,7 @@ module.exports = {
                         .setAuthor({ name: 'Schoology', iconURL: 'https://images-na.ssl-images-amazon.com/images/I/51b+eOYTduL.png', url: oauth_url })
                         .setTitle("User Verification")
 		                .setColor("#14499c")
-                        .setDescription("Click the link below to verify yourself with Schoology")
+                        .setDescription("Click the link below to verify yourself with Schoology (this is not connecting your discord to your Schoology account)")
                         .addFields({ name: "Verify Here:", value: `[Schoology OAuth](${oauth_url})` })
                         msg.channel.send( { embeds: [OAuthEmbed] } );
                 }
