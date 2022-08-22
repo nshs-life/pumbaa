@@ -54,5 +54,35 @@ module.exports = {
 					aboutChannel.send({ embeds: [aboutEmbed] })
 				}
 			})
+		
+		//message new members at 9am, 3pm, 9pm to start verification process
+		let scheduledMessage = new CronJob(
+			'0 9,15,21 * * *',
+			function () {
+
+				const joinReminder = new EmbedBuilder()
+					.setTitle('Hey there!')
+					.setDescription('It seems like you still have the New Member role. Remember to DM me your nps email to get access to the nshs.life server! If you have any questions, feel free to DM an admin')
+					.setColor(0x0099FF)
+
+				//send reminder to people with new member role
+				let guild = client.guilds.cache.get('1004509586142806086')
+				const members = guild.members.fetch().then(members => {
+					members.forEach((value, key) => {
+						guild.members.fetch(key)
+							.then(member => {
+								if (member.roles.cache.has('1004509586142806087')) {
+									member.send({ embeds: [joinReminder] })
+								}
+							})
+					})
+				});
+			},
+			null,
+
+			//start command
+			true,
+			'America/New_York'
+		);
 	},
 };
