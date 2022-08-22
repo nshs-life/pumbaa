@@ -31,6 +31,9 @@ module.exports = {
 							request.react('🚸')
 							request.react('🔎')
 							request.react('♣')
+							request.react('💛')
+							request.react('💗')
+							request.react('💚')
 						})
 				}
 			})
