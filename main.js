@@ -486,6 +486,24 @@ client.on('voiceStateUpdate', async (oldState, newState) => {
 		//whoever's left (tutee/tutor)
 		const personLeft = Array.from(oldState.channel.members.keys())
 		if (personLeft.length == 1 && memberIds.includes(oldState.id) && memberIds.includes(personLeft[0])) {
+			
+			guild.channels.fetch(1011305292216160347).then(channel => {
+				
+				const tutor = await guild.members.fetch(memberIds[0])
+				const tutee = await guild.members.fetch(memberIds[1])
+				${tutee.nickname ? tutee.nickname : user.username}
+				const Embed = new EmbedBuilder()
+					.setTitle(`Tutoring session ended`)
+					.setColor(0x0099FF)
+					.addFields(
+						{ name: 'Meeting end time', value: newState.timestamp },
+						{ name: 'Tutor', value: tutor.nickname ? tutor.nickname : tutor.username },
+						{ name: 'Tutee', value: tutee.nickname ? tutee.nickname : tutee.username });
+
+
+				channel.send({ embeds: [Embed] })
+			})
+			
 			guild.channels.fetch(oldState.channelId).then(channel => {
 				channel.delete()
 			})
