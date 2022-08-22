@@ -227,6 +227,34 @@ client.on('messageReactionAdd', async (reaction, user) => {
 					})
 			}
 
+			//they-them
+			if (reaction.emoji.name == '💗') {
+				const role = guild.roles.cache.get('1011326050283819108')
+				guild.members.fetch(user.id)
+					.then(member => {
+						member.roles.add(role)
+					})
+			}
+
+			//she-her
+			if (reaction.emoji.name == '💛') {
+
+				const role = guild.roles.cache.get('1011325973213495358')
+				guild.members.fetch(user.id)
+					.then(member => {
+						member.roles.add(role)
+					})
+			}
+
+			//he-him
+			if (reaction.emoji.name == '💚') {
+				const role = guild.roles.cache.get('1011326024795037806')
+				guild.members.fetch(user.id)
+					.then(member => {
+						member.roles.add(role)
+					})
+			}
+			
 			//accepting tutor request
 		} else if (reaction.message.channelId == '1005048112890511450' && reaction.emoji.name == '🎓') {
 
@@ -324,7 +352,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
 				const welcome = new EmbedBuilder()
                     .setColor(0x00AE86)
                     .setTitle('Welcome to nshs.life!')
-                    .setDescription('You can check out the server now!')
+                    .setDescription('You can check out the server now! If you would like to change your name, please DM @Admin')
                     .addFields(
                         { name: 'Rules', value: '[rules.nshs.life](https://rules.nshs.life)' });
 				user.send({ embeds: [welcome] })
@@ -446,6 +474,34 @@ client.on('messageReactionRemove', async (reaction, user) => {
 		//club pings
 		if (reaction.emoji.name == '♣') {
 			const role = guild.roles.cache.get('1005371922688778311')
+			guild.members.fetch(user.id)
+				.then(member => {
+					member.roles.remove(role)
+				})
+		}
+		
+		//they-them
+		if (reaction.emoji.name == '💗') {
+			const role = guild.roles.cache.get('1011326050283819108')
+			guild.members.fetch(user.id)
+				.then(member => {
+					member.roles.remove(role)
+				})
+		}
+
+		//she-her
+		if (reaction.emoji.name == '💛') {
+
+			const role = guild.roles.cache.get('1011325973213495358')
+			guild.members.fetch(user.id)
+				.then(member => {
+					member.roles.remove(role)
+				})
+		}
+
+		//he-him
+		if (reaction.emoji.name == '💚') {
+			const role = guild.roles.cache.get('1011326024795037806')
 			guild.members.fetch(user.id)
 				.then(member => {
 					member.roles.remove(role)
