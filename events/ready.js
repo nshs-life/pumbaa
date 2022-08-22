@@ -14,7 +14,10 @@ module.exports = {
 				{ name: 'Developer', value: 'React with 👩‍💻' },
 				{ name: 'Available tutor', value: 'React with 🚸' },
 				{ name: 'Opportunity updates ping', value: 'React with 🔎' },
-				{ name: 'Club updates ping', value: 'React with ♣' });
+				{ name: 'Club updates ping', value: 'React with ♣' },
+				{ name: 'She/Her', value: 'React with 💛' },
+				{ name: 'They/Them', value: 'React with 💗' },
+				{ name: 'He/Him', value: 'React with 💚' });
 
 		let roleChannel = client.channels.cache.get('1005275051383345204')
 
