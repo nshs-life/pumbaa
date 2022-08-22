@@ -526,30 +526,76 @@ client.on('voiceStateUpdate', async (oldState, newState) => {
 		//when the people in the vc are the tutor and tutee, start the session
 		const memberIds = Array.from(newState.channel.members.keys())
 		if (memberIds.length == 2 && memberIds.includes(firstMsg.embeds[0].fields[2].value) && memberIds.includes(firstMsg.embeds[0].fields[3].value)) {
-			guild.channels.fetch(newState.channelId).then(channel => {
-				channel.send("@everyone This tutor session has started, only leave when you are sure that you're done")
+			guild.channels.fetch('1011305292216160347').then(logChannel => {
+
+				const date = new Date();
+				startTime = date.toLocaleString('en-US', {
+					timeZone: 'America/New_York',
+				})
+
+
+				const tutor = guild.members.cache.get(firstMsg.embeds[0].fields[2].value)
+				const tutee = guild.members.cache.get(firstMsg.embeds[0].fields[3].value)
+				const Embed = new EmbedBuilder()
+					.setTitle(`Tutoring session started`)
+					.setColor(0x0099FF)
+					.addFields(
+						{ name: 'Meeting start', value: startTime },
+						{ name: 'Tutor', value: tutor.nickname ? tutor.nickname : tutor.user.username },
+						{ name: 'Tutee', value: tutee.nickname ? tutee.nickname : tutee.user.username });
+
+
+				logChannel.send({ embeds: [Embed] })
+
+				guild.channels.fetch(newState.channelId).then(tutoringChannel => {
+
+					tutoringChannel.send("@everyone This tutor session has started, only leave when you are sure that you're done")
+
+				})
 			})
 		}
 
 	} else if (newState.channel === null) {
 
-		//get first message (the bot's embed)
-		const fetchedMsg = await oldState.channel.messages.fetch({ after: 1, limit: 1 })
-		const firstMsg = fetchedMsg.first()
+		try {
+			//get first message (the bot's embed)
+			const fetchedMsg = await oldState.channel.messages.fetch({ after: 1, limit: 1 })
+			const firstMsg = fetchedMsg.first()
 
-		//possible people allowed
-		const memberIds = [firstMsg.embeds[0].fields[2].value, firstMsg.embeds[0].fields[3].value]
-		//whoever's left (tutee/tutor)
-		const personLeft = Array.from(oldState.channel.members.keys())
-		if (personLeft.length == 1 && memberIds.includes(oldState.id) && memberIds.includes(personLeft[0])) {
-			
-			
-			
-			guild.channels.fetch(oldState.channelId).then(channel => {
-				channel.delete()
-			})
+			//possible people allowed
+			const memberIds = [firstMsg.embeds[0].fields[2].value, firstMsg.embeds[0].fields[3].value]
+			//whoever's left (tutee/tutor)
+			const personLeft = Array.from(oldState.channel.members.keys())
+			if (personLeft.length == 1 && memberIds.includes(oldState.id) && memberIds.includes(personLeft[0])) {
 
-		}
+					guild.channels.fetch('1011305292216160347').then(logChannel => {
+
+					const date = new Date();
+					endTime = date.toLocaleString('en-US', {
+						timeZone: 'America/New_York',
+					})
+
+
+					const tutor = guild.members.cache.get(memberIds[0])
+					const tutee = guild.members.cache.get(memberIds[1])
+					const Embed = new EmbedBuilder()
+						.setTitle(`Tutoring session ended`)
+						.setColor(0x0099FF)
+						.addFields(
+							{ name: 'Meeting end time', value: endTime},
+							{ name: 'Tutor', value: tutor.nickname ? tutor.nickname : tutor.user.username },
+							{ name: 'Tutee', value: tutee.nickname ? tutee.nickname : tutee.user.username });
+
+
+					logChannel.send({ embeds: [Embed] })
+
+					guild.channels.fetch(oldState.channelId).then(tutoringChannel => {
+						tutoringChannel.delete()
+					})
+				})
+
+			}
+		} catch {}
 	}
 
 
