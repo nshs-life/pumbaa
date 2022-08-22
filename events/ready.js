@@ -5,7 +5,7 @@ module.exports = {
 	execute(client) {
 		console.log(`nshs.life.bot logged in as ${client.user.tag}`);
 
-		client.user.setActivity('/help', { type: ActivityType.Watching });
+		client.user.setActivity('Hakuna Matata', { type: ActivityType.Listening });
 
 		const roleEmbed = new EmbedBuilder()
 			.setTitle('Choosing optional server roles')
