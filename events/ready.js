@@ -1,4 +1,6 @@
 const { ActivityType, EmbedBuilder } = require('discord.js');
+const CronJob = require('cron').CronJob;
+
 module.exports = {
 	name: 'ready',
 	once: true,
@@ -55,6 +57,35 @@ module.exports = {
 				}
 			})
 		
+		//send message at 9am, 3pm, and 9pm prompting new users to verify schoology
+		let scheduledMessage = new CronJob(
+			'0 9,15,21 * * *',
+			function () {
+
+				const joinReminder = new EmbedBuilder()
+					.setTitle('Hey there!')
+					.setDescription('It seems like you still have the New Member role. Remember to DM me your nps email to get access to the nshs.life server! If you have any questions, feel free to DM an admin')
+					.setColor(0x0099FF)
+
+				//send reminder to people with new member role
+				let guild = client.guilds.cache.get('1011355033763324085')
+				const members = guild.members.fetch().then(members => {
+					members.forEach((value, key) => {
+						guild.members.fetch(key)
+							.then(member => {
+								if (member.roles.cache.has('1011355033763324090')) {
+									member.send({ embeds: [joinReminder] })
+								}
+							})
+					})
+				});
+			},
+			null,
+
+			//start command
+			true,
+			'America/New_York'
+		);
 		
 	},
 };
