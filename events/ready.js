@@ -59,12 +59,12 @@ module.exports = {
 		
 		//send message at 9am, 3pm, and 9pm prompting new users to verify schoology
 		let scheduledMessage = new CronJob(
-			'0 9,15,21 * * *',
+			'0 10,22 * * *',
 			function () {
 
 				const joinReminder = new EmbedBuilder()
 					.setTitle('Hey there!')
-					.setDescription('It seems like you still have the New Member role. Remember to DM me your nps email to get access to the nshs.life server! If you have any questions, feel free to DM an admin')
+					.setDescription('It seems like you still have the New Member role. Remember to DM me your nps email to start the verification process for full access to the nshs.life server! If you have any questions, feel free to DM an admin')
 					.setColor(0x0099FF)
 
 				//send reminder to people with new member role
