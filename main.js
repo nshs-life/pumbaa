@@ -84,6 +84,21 @@ client.on('guildMemberAdd', member => {
 })
 
 
+//new members handler
+client.on('guildMemberRemove', member => {
+
+	//get leave-log
+	let guild = client.guilds.cache.get('1004509586142806086')
+	const channel = guild.channels.cache.get('1011623965694906408');
+
+	//message leave-log that member left
+	const leaveEmbed = new EmbedBuilder()
+		.setAuthor({name:`${member.user.tag} just left`, iconURL: member.user.avatarURL()})
+		.setColor("#0x76271E");
+	channel.send({ embeds: [leaveEmbed] })
+})
+
+
 //replying to DMs
 client.on('messageCreate', msg => {
 
