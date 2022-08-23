@@ -68,12 +68,12 @@ module.exports = {
 					.setColor(0x0099FF)
 
 				//send reminder to people with new member role
-				let guild = client.guilds.cache.get('1011355033763324085')
+				let guild = client.guilds.cache.get('1004509586142806086')
 				const members = guild.members.fetch().then(members => {
 					members.forEach((value, key) => {
 						guild.members.fetch(key)
 							.then(member => {
-								if (member.roles.cache.has('1011355033763324090')) {
+								if (member.roles.cache.has('1004509586142806087')) {
 									member.send({ embeds: [joinReminder] })
 								}
 							})
