@@ -57,27 +57,24 @@ module.exports = {
 				}
 			})
 		
-		//send message at 9am, 3pm, and 9pm prompting new users to verify schoology
+		//send message at 9am and 9pm prompting new users to verify schoology
 		let scheduledMessage = new CronJob(
-			'0 10,22 * * *',
-			function () {
+			'0 9,21 * * *',
+			async function () {
 
 				const joinReminder = new EmbedBuilder()
 					.setTitle('Hey there!')
-					.setDescription('It seems like you still have the New Member role. Remember to DM me your nps email to start the verification process for full access to the nshs.life server! If you have any questions, feel free to DM an admin')
+					.setDescription('It seems like you still have the New Member role. Remember to DM me your nps email to get access to the nshs.life server! If you have any questions, feel free to DM an admin')
 					.setColor(0x0099FF)
 
 				//send reminder to people with new member role
 				let guild = client.guilds.cache.get('1004509586142806086')
-				const members = guild.members.fetch().then(members => {
-					members.forEach((value, key) => {
-						guild.members.fetch(key)
-							.then(member => {
-								if (member.roles.cache.has('1004509586142806087')) {
-									member.send({ embeds: [joinReminder] })
-								}
-							})
-					})
+
+				members = await guild.members.fetch()
+				members.forEach((member) => {
+					if (member.roles.cache.has('1004509586142806087')) {
+						member.send({ embeds: [joinReminder] })
+					}
 				});
 			},
 			null,
