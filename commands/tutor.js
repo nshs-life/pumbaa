@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
-const { discordIDSwitcher } = require('./helper.js');
+const { discordIDSwitcher } = require('../helper.js');
 
 let discord_ids = discordIDSwitcher();
 

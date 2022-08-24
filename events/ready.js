@@ -1,6 +1,6 @@
 const { ActivityType, EmbedBuilder } = require('discord.js');
 const CronJob = require('cron').CronJob;
-const { discordIDSwitcher } = require('./helper.js');
+const { discordIDSwitcher } = require('../helper.js');
 
 let discord_ids = discordIDSwitcher();
 
