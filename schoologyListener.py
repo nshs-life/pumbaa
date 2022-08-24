@@ -67,6 +67,7 @@ def main():
         sys.stderr.flush()
         sys.exit(1)
     
+    # Move forward with schoology authorization if they've authorized
     if auth.authorize():
         schoology = schoolopy.Schoology(auth)
         data.start = False
@@ -74,8 +75,7 @@ def main():
         data.display_name = schoology.get_me().name_display
         email = schoology.get_me().primary_email
         
-        print(f"{email}: {email[:9]}")
-
+        # Checks if first 9 characters of email are a number, which determines if the user is a student
         if email[:9].isnumeric():
             data.student = True
         else:
@@ -84,6 +84,9 @@ def main():
             sys.stderr.flush()
             sys.exit(1)
         
+        # Grabs courses of student
+        # Searches for course: "NSHS Library: Class of {grad year}"
+        # Determines grade from there
         uid = schoology.get_me().uid
         sections = schoology.get_user_sections(uid)
         for section in sections:
@@ -92,8 +95,7 @@ def main():
                 if "Class of " + grade in courseTitle:
                     data.grade = Grades()[grade]
                     break
-        if data.grade == "null":
-            data.grade = "null"
+        # Grade is kept "null" if there is no course
         
         sys.stdout.write(data.json())
         sys.stdout.flush()
