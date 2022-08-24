@@ -365,11 +365,13 @@ client.on('messageReactionAdd', async (reaction, user) => {
 					})
 
 				const welcome = new EmbedBuilder()
-				    .setColor(0x00AE86)
-				    .setTitle('Welcome to nshs.life!')
-				    .setDescription('You can check out the server now! If you would like to change your name, please DM @Admin')
-				    .addFields(
-					{ name: 'Rules', value: '[rules.nshs.life](https://docs.google.com/document/u/5/d/e/2PACX-1vSJ1NB4b7RmcOWPEiDMXVQtug1nHvnzwaSjTvEBq_keDMVgDrut2aZxN6uGD8ccL8xMnvWFXIS8PT09/pub)' });
+					.setColor(0x00AE86)
+					.setTitle('Welcome to nshs.life! You can check out the server now!')
+					.setDescription('If you would like to change your name, please DM @Admin')
+					.addFields({ name: 'Additional roles', value: 'Please take a look at the #role-assignment channel' })
+					.addFields({ name: 'Pumbaa commands', value: 'Use /help anywhere in the server to get slash commands' })
+					.addFields({ name: 'Server rules', value: '[rules.nshs.life](https://docs.google.com/document/u/5/d/e/2PACX-1vSJ1NB4b7RmcOWPEiDMXVQtug1nHvnzwaSjTvEBq_keDMVgDrut2aZxN6uGD8ccL8xMnvWFXIS8PT09/pub)' });
+				
 				user.send({ embeds: [welcome] })
 				reaction.message.delete()
 			}
