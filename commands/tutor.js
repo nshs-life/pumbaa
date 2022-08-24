@@ -1,4 +1,7 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { discordIDSwitcher } = require('./helper.js');
+
+let discord_ids = discordIDSwitcher();
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -48,7 +51,7 @@ module.exports = {
             .setFooter({ text: interaction.user.id });
 
         //post request to tutors
-        interaction.guild.channels.fetch('1005048112890511450')
+        interaction.guild.channels.fetch(discord_ids["channels"]["tutor-requests"])
             .then(channel => channel.send({ embeds: [Embed] })
                 .then(request => {
                     request.react("🎓")

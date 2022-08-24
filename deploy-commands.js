@@ -3,11 +3,8 @@ const path = require('node:path');
 const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord.js');
 
-if (fs.existsSync("./config.json")) {
-    var { clientId, guildId, token } = require('./config.json');
-} else {
-    var { clientId, guildId, token } = process.env;
-}
+const { config_load } = require('./helper.js');
+const { clientId, guildId, token } = config_load();
 
 
 const commands = [];
