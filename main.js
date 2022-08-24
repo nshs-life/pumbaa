@@ -78,7 +78,7 @@ client.on('guildMemberAdd', member => {
 		.addFields({ name: 'Our Mission', value: '[mission.nshs.life](https://docs.google.com/document/u/5/d/e/2PACX-1vToUA9QApqWmo_k5YGaouh1-FexC5tqLzUIZv6fJZGneyBZwM_ImYNDzraq3mT5FzQVS_EGC7Kdk_Oj/pub)' })
 		.addFields({ name: 'Our Rules', value: '[rules.nshs.life](https://docs.google.com/document/u/5/d/e/2PACX-1vSJ1NB4b7RmcOWPEiDMXVQtug1nHvnzwaSjTvEBq_keDMVgDrut2aZxN6uGD8ccL8xMnvWFXIS8PT09/pub)' })
 
-		.addFields({ name: 'Join Requirement', value: 'Please type out your school email to Pumbaa' });
+		.addFields({ name: 'Join Requirement', value: 'Please message me your school email (example@newton.k12.ma.us) to access the rest of the nshs.life server' });
 
 	member.send({ embeds: [Embed] })
 })
@@ -147,12 +147,12 @@ client.on('messageCreate', msg => {
                                 const errorEmbed = new EmbedBuilder()
                                     .setTitle('Verification Timed Out')
                                     .setColor(0xFF0000)
-                                    .setDescription('Schoology authentication timed out. Send your school email again to re-verify.')
+                                    .setDescription('The Schoology authentication process has timed out (60 seconds). Please message me your school email (example@newton.k12.ma.us) again to re-verify.')
                                 msg.channel.send({ embeds: [errorEmbed] })
                             })
 					} else {
 						const loginReqEmbed = new EmbedBuilder()
-							.setTitle('Please type out your nps email in this dm')
+							.setTitle('Please type out your school email (example@newton.k12.ma.us) in this dm')
 						msg.channel.send({ embeds: [loginReqEmbed] })
 					}
 					//already a member
