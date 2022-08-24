@@ -1,5 +1,8 @@
 const { ActivityType, EmbedBuilder } = require('discord.js');
 const CronJob = require('cron').CronJob;
+const { discordIDSwitcher } = require('./helper.js');
+
+let discord_ids = discordIDSwitcher();
 
 module.exports = {
 	name: 'ready',
@@ -21,7 +24,7 @@ module.exports = {
 				{ name: 'They/Them', value: 'React with 💗' },
 				{ name: 'He/Him', value: 'React with 💚' });
 
-		let roleChannel = client.channels.cache.get('1005275051383345204')
+		let roleChannel = client.channels.cache.get(discord_ids["channels"]["role-assignment"])
 
 		roleChannel.messages.fetch()
 			.then(msgs => {
@@ -47,7 +50,7 @@ module.exports = {
 				{ name: 'Our Mission', value: '[mission.nshs.life](https://docs.google.com/document/u/5/d/e/2PACX-1vToUA9QApqWmo_k5YGaouh1-FexC5tqLzUIZv6fJZGneyBZwM_ImYNDzraq3mT5FzQVS_EGC7Kdk_Oj/pub)' },
 				{ name: 'Our Rules', value: '[rules.nshs.life](https://docs.google.com/document/u/5/d/e/2PACX-1vSJ1NB4b7RmcOWPEiDMXVQtug1nHvnzwaSjTvEBq_keDMVgDrut2aZxN6uGD8ccL8xMnvWFXIS8PT09/pub)' });
 
-		let aboutChannel = client.channels.cache.get('1004509828879757393')
+		let aboutChannel = client.channels.cache.get(discord_ids["channels"]["about"])
 
 		aboutChannel.messages.fetch()
 			.then(msgs => {
@@ -68,11 +71,11 @@ module.exports = {
 					.setColor(0x0099FF)
 
 				//send reminder to people with new member role
-				let guild = client.guilds.cache.get('1004509586142806086')
+				let guild = client.guilds.cache.get(discord_ids["server"])
 
 				members = await guild.members.fetch()
 				members.forEach((member) => {
-					if (member.roles.cache.has('1004509586142806087')) {
+					if (member.roles.cache.has(discord_ids["roles"]["new-member"])) {
 						member.send({ embeds: [joinReminder] })
 					}
 				});
