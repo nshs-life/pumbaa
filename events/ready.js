@@ -1,4 +1,6 @@
 const { ActivityType, EmbedBuilder } = require('discord.js');
+const CronJob = require('cron').CronJob;
+
 module.exports = {
 	name: 'ready',
 	once: true,
@@ -39,9 +41,11 @@ module.exports = {
 			})
 
 		const aboutEmbed = new EmbedBuilder()
-			.setTitle('Our mission')
-			.setDescription('[mission.nshs.life](https://docs.google.com/document/u/5/d/e/2PACX-1vToUA9QApqWmo_k5YGaouh1-FexC5tqLzUIZv6fJZGneyBZwM_ImYNDzraq3mT5FzQVS_EGC7Kdk_Oj/pub)')
-			.setColor(0x0099FF);
+			.setTitle('nshs.life')
+			.setColor(0xe74c3c)
+			.addFields(
+				{ name: 'Our Mission', value: '[mission.nshs.life](https://docs.google.com/document/u/5/d/e/2PACX-1vToUA9QApqWmo_k5YGaouh1-FexC5tqLzUIZv6fJZGneyBZwM_ImYNDzraq3mT5FzQVS_EGC7Kdk_Oj/pub)' },
+				{ name: 'Our Rules', value: '[rules.nshs.life](https://docs.google.com/document/u/5/d/e/2PACX-1vSJ1NB4b7RmcOWPEiDMXVQtug1nHvnzwaSjTvEBq_keDMVgDrut2aZxN6uGD8ccL8xMnvWFXIS8PT09/pub)' });
 
 		let aboutChannel = client.channels.cache.get('1004509828879757393')
 
@@ -52,5 +56,33 @@ module.exports = {
 					aboutChannel.send({ embeds: [aboutEmbed] })
 				}
 			})
+		
+		//send message at 9am and 9pm prompting new users to verify schoology
+		let scheduledMessage = new CronJob(
+			'0 9,21 * * *',
+			async function () {
+
+				const joinReminder = new EmbedBuilder()
+					.setTitle('Hey there!')
+					.setDescription('It seems like you still have the New Member role. Remember to DM me your nps email (example@newton.k12.ma.us) to get access to the nshs.life server! If you have any questions, feel free to DM an admin')
+					.setColor(0x0099FF)
+
+				//send reminder to people with new member role
+				let guild = client.guilds.cache.get('1004509586142806086')
+
+				members = await guild.members.fetch()
+				members.forEach((member) => {
+					if (member.roles.cache.has('1004509586142806087')) {
+						member.send({ embeds: [joinReminder] })
+					}
+				});
+			},
+			null,
+
+			//start command
+			true,
+			'America/New_York'
+		);
+		
 	},
 };

@@ -78,9 +78,24 @@ client.on('guildMemberAdd', member => {
 		.addFields({ name: 'Our Mission', value: '[mission.nshs.life](https://docs.google.com/document/u/5/d/e/2PACX-1vToUA9QApqWmo_k5YGaouh1-FexC5tqLzUIZv6fJZGneyBZwM_ImYNDzraq3mT5FzQVS_EGC7Kdk_Oj/pub)' })
 		.addFields({ name: 'Our Rules', value: '[rules.nshs.life](https://docs.google.com/document/u/5/d/e/2PACX-1vSJ1NB4b7RmcOWPEiDMXVQtug1nHvnzwaSjTvEBq_keDMVgDrut2aZxN6uGD8ccL8xMnvWFXIS8PT09/pub)' })
 
-		.addFields({ name: 'Join Requirement', value: 'Please type out your school email to Pumbaa' });
+		.addFields({ name: 'Join Requirement', value: 'Please message me your school email (example@newton.k12.ma.us) to access the rest of the nshs.life server' });
 
 	member.send({ embeds: [Embed] })
+})
+
+
+//new members handler
+client.on('guildMemberRemove', member => {
+
+	//get leave-log
+	let guild = client.guilds.cache.get('1004509586142806086')
+	const channel = guild.channels.cache.get('1011623965694906408');
+
+	//message leave-log that member left
+	const leaveEmbed = new EmbedBuilder()
+		.setAuthor({name:`${member.user.tag} just left`, iconURL: member.user.avatarURL()})
+		.setColor("#0x76271E");
+	channel.send({ embeds: [leaveEmbed] })
 })
 
 
@@ -132,12 +147,12 @@ client.on('messageCreate', msg => {
                                 const errorEmbed = new EmbedBuilder()
                                     .setTitle('Verification Timed Out')
                                     .setColor(0xFF0000)
-                                    .setDescription('Schoology authentication timed out. Send your school email again to re-verify.')
+                                    .setDescription('The Schoology authentication process has timed out (60 seconds). Please message me your school email (example@newton.k12.ma.us) again to re-verify.')
                                 msg.channel.send({ embeds: [errorEmbed] })
                             })
 					} else {
 						const loginReqEmbed = new EmbedBuilder()
-							.setTitle('Please type out your nps email in this dm')
+							.setTitle('Please type out your school email (example@newton.k12.ma.us) in this dm')
 						msg.channel.send({ embeds: [loginReqEmbed] })
 					}
 					//already a member
@@ -350,11 +365,13 @@ client.on('messageReactionAdd', async (reaction, user) => {
 					})
 
 				const welcome = new EmbedBuilder()
-                    .setColor(0x00AE86)
-                    .setTitle('Welcome to nshs.life!')
-                    .setDescription('You can check out the server now! If you would like to change your name, please DM @Admin')
-                    .addFields(
-                        { name: 'Rules', value: '[rules.nshs.life](https://rules.nshs.life)' });
+					.setColor(0x00AE86)
+					.setTitle('Welcome to nshs.life! You can check out the server now!')
+					.setDescription('If you would like to change your name, please DM @Admin')
+					.addFields({ name: 'Additional roles', value: 'Please take a look at the #role-assignment channel' })
+					.addFields({ name: 'Pumbaa commands', value: 'Use /help anywhere in the server to get slash commands' })
+					.addFields({ name: 'Server rules', value: '[rules.nshs.life](https://docs.google.com/document/u/5/d/e/2PACX-1vSJ1NB4b7RmcOWPEiDMXVQtug1nHvnzwaSjTvEBq_keDMVgDrut2aZxN6uGD8ccL8xMnvWFXIS8PT09/pub)' });
+				
 				user.send({ embeds: [welcome] })
 				reaction.message.delete()
 			}
@@ -526,30 +543,76 @@ client.on('voiceStateUpdate', async (oldState, newState) => {
 		//when the people in the vc are the tutor and tutee, start the session
 		const memberIds = Array.from(newState.channel.members.keys())
 		if (memberIds.length == 2 && memberIds.includes(firstMsg.embeds[0].fields[2].value) && memberIds.includes(firstMsg.embeds[0].fields[3].value)) {
-			guild.channels.fetch(newState.channelId).then(channel => {
-				channel.send("@everyone This tutor session has started, only leave when you are sure that you're done")
+			guild.channels.fetch('1011305292216160347').then(logChannel => {
+
+				const date = new Date();
+				startTime = date.toLocaleString('en-US', {
+					timeZone: 'America/New_York',
+				})
+
+
+				const tutor = guild.members.cache.get(firstMsg.embeds[0].fields[2].value)
+				const tutee = guild.members.cache.get(firstMsg.embeds[0].fields[3].value)
+				const Embed = new EmbedBuilder()
+					.setTitle(`Tutoring session started`)
+					.setColor(0x0099FF)
+					.addFields(
+						{ name: 'Meeting start', value: startTime },
+						{ name: 'Tutor', value: tutor.nickname ? tutor.nickname : tutor.user.username },
+						{ name: 'Tutee', value: tutee.nickname ? tutee.nickname : tutee.user.username });
+
+
+				logChannel.send({ embeds: [Embed] })
+
+				guild.channels.fetch(newState.channelId).then(tutoringChannel => {
+
+					tutoringChannel.send("@everyone This tutor session has started, only leave when you are sure that you're done")
+
+				})
 			})
 		}
 
 	} else if (newState.channel === null) {
 
-		//get first message (the bot's embed)
-		const fetchedMsg = await oldState.channel.messages.fetch({ after: 1, limit: 1 })
-		const firstMsg = fetchedMsg.first()
+		try {
+			//get first message (the bot's embed)
+			const fetchedMsg = await oldState.channel.messages.fetch({ after: 1, limit: 1 })
+			const firstMsg = fetchedMsg.first()
 
-		//possible people allowed
-		const memberIds = [firstMsg.embeds[0].fields[2].value, firstMsg.embeds[0].fields[3].value]
-		//whoever's left (tutee/tutor)
-		const personLeft = Array.from(oldState.channel.members.keys())
-		if (personLeft.length == 1 && memberIds.includes(oldState.id) && memberIds.includes(personLeft[0])) {
-			
-			
-			
-			guild.channels.fetch(oldState.channelId).then(channel => {
-				channel.delete()
-			})
+			//possible people allowed
+			const memberIds = [firstMsg.embeds[0].fields[2].value, firstMsg.embeds[0].fields[3].value]
+			//whoever's left (tutee/tutor)
+			const personLeft = Array.from(oldState.channel.members.keys())
+			if (personLeft.length == 1 && memberIds.includes(oldState.id) && memberIds.includes(personLeft[0])) {
 
-		}
+					guild.channels.fetch('1011305292216160347').then(logChannel => {
+
+					const date = new Date();
+					endTime = date.toLocaleString('en-US', {
+						timeZone: 'America/New_York',
+					})
+
+
+					const tutor = guild.members.cache.get(memberIds[0])
+					const tutee = guild.members.cache.get(memberIds[1])
+					const Embed = new EmbedBuilder()
+						.setTitle(`Tutoring session ended`)
+						.setColor(0x0099FF)
+						.addFields(
+							{ name: 'Meeting end time', value: endTime},
+							{ name: 'Tutor', value: tutor.nickname ? tutor.nickname : tutor.user.username },
+							{ name: 'Tutee', value: tutee.nickname ? tutee.nickname : tutee.user.username });
+
+
+					logChannel.send({ embeds: [Embed] })
+
+					guild.channels.fetch(oldState.channelId).then(tutoringChannel => {
+						tutoringChannel.delete()
+					})
+				})
+
+			}
+		} catch {}
 	}
 
 
