@@ -27,7 +27,8 @@ module.exports = {
                         .setAuthor({ name: 'Schoology', iconURL: 'https://images-na.ssl-images-amazon.com/images/I/51b+eOYTduL.png', url: oauth_url })
                         .setTitle("User Verification")
 		                .setColor("#14499c")
-                        .setDescription("Click the link below to verify yourself with Schoology (this is not connecting your discord to your Schoology account)")
+                        .setDescription("Please click the link to verify yourself with Schoology")
+			.addFields({ name: "Disclamer!!!", value: `We are not able to access any personal information like class grades. We only use Schoology OAuth to assign your nickname on the nshs.life server` })
                         .addFields({ name: "Verify Here:", value: `[Schoology OAuth](${oauth_url})` })
                         msg.channel.send( { embeds: [OAuthEmbed] } );
                 }

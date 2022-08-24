@@ -78,7 +78,7 @@ client.on('guildMemberAdd', member => {
 		.addFields({ name: 'Our Mission', value: '[mission.nshs.life](https://docs.google.com/document/u/5/d/e/2PACX-1vToUA9QApqWmo_k5YGaouh1-FexC5tqLzUIZv6fJZGneyBZwM_ImYNDzraq3mT5FzQVS_EGC7Kdk_Oj/pub)' })
 		.addFields({ name: 'Our Rules', value: '[rules.nshs.life](https://docs.google.com/document/u/5/d/e/2PACX-1vSJ1NB4b7RmcOWPEiDMXVQtug1nHvnzwaSjTvEBq_keDMVgDrut2aZxN6uGD8ccL8xMnvWFXIS8PT09/pub)' })
 
-		.addFields({ name: 'Join Requirement', value: 'Please type out your school email to Pumbaa' });
+		.addFields({ name: 'Join Requirement', value: 'Please message me your school email (example@newton.k12.ma.us) to access the rest of the nshs.life server' });
 
 	member.send({ embeds: [Embed] })
 })
@@ -147,12 +147,12 @@ client.on('messageCreate', msg => {
                                 const errorEmbed = new EmbedBuilder()
                                     .setTitle('Verification Timed Out')
                                     .setColor(0xFF0000)
-                                    .setDescription('Schoology authentication timed out. Send your school email again to re-verify.')
+                                    .setDescription('The Schoology authentication process has timed out (60 seconds). Please message me your school email (example@newton.k12.ma.us) again to re-verify.')
                                 msg.channel.send({ embeds: [errorEmbed] })
                             })
 					} else {
 						const loginReqEmbed = new EmbedBuilder()
-							.setTitle('Please type out your nps email in this dm')
+							.setTitle('Please type out your school email (example@newton.k12.ma.us) in this dm')
 						msg.channel.send({ embeds: [loginReqEmbed] })
 					}
 					//already a member
@@ -365,11 +365,13 @@ client.on('messageReactionAdd', async (reaction, user) => {
 					})
 
 				const welcome = new EmbedBuilder()
-				    .setColor(0x00AE86)
-				    .setTitle('Welcome to nshs.life!')
-				    .setDescription('You can check out the server now! If you would like to change your name, please DM @Admin')
-				    .addFields(
-					{ name: 'Rules', value: '[rules.nshs.life](https://docs.google.com/document/u/5/d/e/2PACX-1vSJ1NB4b7RmcOWPEiDMXVQtug1nHvnzwaSjTvEBq_keDMVgDrut2aZxN6uGD8ccL8xMnvWFXIS8PT09/pub)' });
+					.setColor(0x00AE86)
+					.setTitle('Welcome to nshs.life! You can check out the server now!')
+					.setDescription('If you would like to change your name, please DM @Admin')
+					.addFields({ name: 'Additional roles', value: 'Please take a look at the #role-assignment channel' })
+					.addFields({ name: 'Pumbaa commands', value: 'Use /help anywhere in the server to get slash commands' })
+					.addFields({ name: 'Server rules', value: '[rules.nshs.life](https://docs.google.com/document/u/5/d/e/2PACX-1vSJ1NB4b7RmcOWPEiDMXVQtug1nHvnzwaSjTvEBq_keDMVgDrut2aZxN6uGD8ccL8xMnvWFXIS8PT09/pub)' });
+				
 				user.send({ embeds: [welcome] })
 				reaction.message.delete()
 			}
