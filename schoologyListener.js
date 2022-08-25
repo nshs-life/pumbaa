@@ -3,12 +3,12 @@ const { spawn } = require("child_process");
 const { EmbedBuilder } = require('discord.js');
 const { config_load } = require('./helper.js');
 
-const { schoologyKey, schoologySecret } = config_load();
+const { SCHOOLOGY_KEY, SCHOOLOGY_SECRET } = config_load();
 
 module.exports = {
     SchoologyAuthenticate: async function (msg) {
         return new Promise((resolve, reject) => {
-            const pythonProcess = spawn('python', ["schoologyListener.py", schoologyKey, schoologySecret]);
+            const pythonProcess = spawn('python', ["schoologyListener.py", SCHOOLOGY_KEY, SCHOOLOGY_SECRET]);
 
             // Open up a listener for data
             pythonProcess.stdout.on('data', (data) => {
