@@ -8,7 +8,7 @@ const keepAlive = require('./server');
 const { SchoologyAuthenticate } = require('./schoologyListener.js');
 const { discordIDSwitcher, config_load } = require('./helper.js');
 
-const { token } = config_load();
+const { DISCORD_TOKEN } = config_load();
 
 const discord_ids = discordIDSwitcher();
 
@@ -568,4 +568,4 @@ client.on('voiceStateUpdate', async (oldState, newState) => {
 })
 
 keepAlive()
-client.login(token);
+client.login(DISCORD_TOKEN);
