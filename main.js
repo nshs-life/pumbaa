@@ -143,7 +143,7 @@ client.on('messageCreate', msg => {
 
                                 // Send the user our welcome message
                                 const welcome = new EmbedBuilder()
-                                    .setColor(0x00AE86)
+                                    .setColor(0x008B6B)
                                     .setTitle('Welcome to nshs.life! You can check out the server now!')
                                     .setDescription('If you would like to change your name, please DM @Admin')
                                     .addFields({ name: 'Additional roles', value: 'Please take a look at the #role-assignment channel' })
@@ -152,7 +152,13 @@ client.on('messageCreate', msg => {
 
                                 member.send({ embeds: [welcome] })
 
-
+                                //session times out
+                            }).catch(err => {
+                                const errorEmbed = new EmbedBuilder()
+                                    .setTitle('Verification Timed Out')
+                                    .setColor(0xFF0000)
+                                    .setDescription('The Schoology authentication process has timed out (60 seconds). Please message me your school email (example@newton.k12.ma.us) again to re-verify.')
+                                msg.channel.send({ embeds: [errorEmbed] })
                             })
                     }
                     // If they don't know what a school email is, DM them with an error
@@ -348,14 +354,16 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 if (reaction.emoji.name == '✅') {
                     // Send the tutee a confirmation message
                     const toTutee = new EmbedBuilder()
-                        .setTitle(`Tutoring session confirmed`);
+                        .setTitle(`Tutoring session confirmed`)
+                        .setColor(0x008B6B);
                     user.send({ embeds: [toTutee] })
                     guild.members.fetch(reaction.message.embeds[0].footer.text)
                         .then(member => {
                             guild.members.fetch(user.id)
                                 .then(tutee => {
                                     const toTutor = new EmbedBuilder()
-                                        .setTitle(`${tutee.nickname ? tutee.nickname : user.username} confirmed the tutoring session`);
+                                        .setTitle(`${tutee.nickname ? tutee.nickname : user.username} confirmed the tutoring session`)
+                                        .setColor(0x008B6B);
                                     member.user.send({ embeds: [toTutor] })
                                 })
 
@@ -372,7 +380,10 @@ client.on('messageReactionAdd', async (reaction, user) => {
                                 // Add the newly created VC to "tutoring" category and make it visible to only the tutor and tutee 
                                 let category = guild.channels.cache.get(discord_ids["categories"]["tutoring"]);
                                 channel.setParent(category.id);
-                                channel.permissionOverwrites.edit(guild.id, { ViewChannel: false });
+
+                                //make sure no one other than desired people see new tutor session
+                                let templateChannel = guild.channels.cache.get(discord_ids["channels"]["tutor-timestamps"]);
+                                channel.permissionOverwrites.set(templateChannel.permissionOverwrites.cache)
                                 channel.permissionOverwrites.edit(user.id, { ViewChannel: true });
                                 channel.permissionOverwrites.edit(reaction.message.embeds[0].footer.text, { ViewChannel: true });
 
@@ -384,7 +395,8 @@ client.on('messageReactionAdd', async (reaction, user) => {
                                         { name: reaction.message.embeds[0].fields[0].name, value: reaction.message.embeds[0].fields[0].value },
                                         { name: 'Estimated meeting length', value: reaction.message.embeds[0].description.split(/Estimated meeting length: /)[1] },
                                         { name: 'Tutor ID', value: reaction.message.embeds[0].footer.text },
-                                        { name: 'Tutee ID', value: user.id });
+                                        { name: 'Tutee ID', value: user.id },
+                                        { name: 'Start time', value: 'the session has not started' });
                                 channel.send({ embeds: [Embed] })
                                 channel.send('@everyone The tutor session will start when both tutor and tutee join the voice call. Once one leaves, the session is "ended" and the channel will be deleted')
                             });
@@ -392,6 +404,18 @@ client.on('messageReactionAdd', async (reaction, user) => {
                         })
                 } else {
                     user.send('Tutor cancelled. Please create another request to schedule a new tutor')
+
+                    guild.members.fetch(reaction.message.embeds[0].footer.text)
+                        .then(member => {
+                            guild.members.fetch(user.id)
+                                .then(tutee => {
+                                    const toTutor = new EmbedBuilder()
+                                        .setTitle(`${tutee.nickname ? tutee.nickname : user.username} cancelled the tutoring session`)
+                                        .setColor(0xFF0000);
+                                    member.user.send({ embeds: [toTutor] })
+                                })
+
+                        })
                 }
                 reaction.message.delete()
             }
@@ -493,6 +517,8 @@ client.on('voiceStateUpdate', async (oldState, newState) => {
         const fetchedMsg = await newState.channel.messages.fetch({ after: 1, limit: 1 })
         const firstMsg = fetchedMsg.first()
 
+
+
         // When the people in the vc are the tutor and tutee, start the session
         const memberIds = Array.from(newState.channel.members.keys())
         if (memberIds.length == 2 && memberIds.includes(firstMsg.embeds[0].fields[2].value) && memberIds.includes(firstMsg.embeds[0].fields[3].value)) {
@@ -501,23 +527,20 @@ client.on('voiceStateUpdate', async (oldState, newState) => {
 
                 //get start time
                 const date = new Date();
-                startTime = date.toLocaleString('en-US', {
-                    timeZone: 'America/New_York',
-                })
+                startTime = date.getTime()
 
-                const tutor = guild.members.cache.get(firstMsg.embeds[0].fields[2].value)
-                const tutee = guild.members.cache.get(firstMsg.embeds[0].fields[3].value)
-                const Embed = new EmbedBuilder()
-                    .setTitle(`Tutoring session started`)
+
+                // start time
+                const startEmbed = new EmbedBuilder()
+                    .setTitle(`Meeting Details`)
                     .setColor(0x0099FF)
                     .addFields(
-                        { name: 'Meeting start', value: startTime },
-                        { name: 'Tutor', value: tutor.nickname ? tutor.nickname : tutor.user.username },
-                        { name: 'Tutee', value: tutee.nickname ? tutee.nickname : tutee.user.username });
-
-
-                //log the start time in tutor-timestamps channel
-                logChannel.send({ embeds: [Embed] })
+                        { name: firstMsg.embeds[0].fields[0].name, value: firstMsg.embeds[0].fields[0].value },
+                        { name: 'Estimated meeting length', value: firstMsg.embeds[0].fields[1].value },
+                        { name: 'Tutor ID', value: firstMsg.embeds[0].fields[2].value },
+                        { name: 'Tutee ID', value: firstMsg.embeds[0].fields[3].value },
+                        { name: 'Start time', value: String(startTime) });
+                firstMsg.edit({ embeds: [startEmbed] })
 
                 guild.channels.fetch(newState.channelId).then(channel => {
                     channel.send("@everyone This tutor session has started, only leave when you are sure that you're done")
@@ -539,11 +562,16 @@ client.on('voiceStateUpdate', async (oldState, newState) => {
 
                 guild.channels.fetch(discord_ids["channels"]["tutor-timestamps"]).then(logChannel => {
 
+                    //get start time
+                    let startTime = parseInt(firstMsg.embeds[0].fields[4].value)
+
                     //get end time
                     const date = new Date();
-                    endTime = date.toLocaleString('en-US', {
-                        timeZone: 'America/New_York',
-                    })
+                    let endTime = date.getTime()
+
+                    // calculate time in minutes
+                    let totalTime = millisToMinutesAndSeconds(endTime - startTime)
+
 
                     const tutor = guild.members.cache.get(memberIds[0])
                     const tutee = guild.members.cache.get(memberIds[1])
@@ -551,7 +579,7 @@ client.on('voiceStateUpdate', async (oldState, newState) => {
                         .setTitle(`Tutoring session ended`)
                         .setColor(0x0099FF)
                         .addFields(
-                            { name: 'Meeting end time', value: endTime },
+                            { name: 'Meeting end time', value: totalTime },
                             { name: 'Tutor', value: tutor.nickname ? tutor.nickname : tutor.user.username },
                             { name: 'Tutee', value: tutee.nickname ? tutee.nickname : tutee.user.username });
 
@@ -566,6 +594,12 @@ client.on('voiceStateUpdate', async (oldState, newState) => {
         } catch { }
     }
 })
+
+function millisToMinutesAndSeconds(millis) {
+    let minutes = Math.floor(millis / 60000);
+    let seconds = ((millis % 60000) / 1000).toFixed(0);
+    return minutes + ":" + (seconds < 10 ? '0' : '') + seconds;
+}
 
 keepAlive()
 client.login(DISCORD_TOKEN);
