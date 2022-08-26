@@ -128,14 +128,14 @@ client.on('messageCreate', msg => {
 
                                 // add proper grade role and remove New Member role
                                 let role
-                                if (grade === null) {
-                                    role = guild.roles.cache.get(discord_ids["roles"]["freshman"]);
-                                } else if (grade == 10) {
+                                if (grade == 10) {
                                     role = guild.roles.cache.get(discord_ids["roles"]["sophomore"]);
                                 } else if (grade == 11) {
                                     role = guild.roles.cache.get(discord_ids["roles"]["junior"]);
-                                } else {
+                                } else if (grade == 12) {
                                     role = guild.roles.cache.get(discord_ids["roles"]["senior"]);
+                                } else {
+                                    role = guild.roles.cache.get(discord_ids["roles"]["freshman"]);
                                 }
 
                                 member.roles.remove(guild.roles.cache.get(discord_ids["roles"]["new-member"]))
