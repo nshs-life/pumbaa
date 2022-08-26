@@ -62,7 +62,7 @@ module.exports = {
 		
 		//send message at 9am and 9pm prompting new users to verify schoology
 		let scheduledMessage = new CronJob(
-			'0 9,21 * * *',
+			'20 4 * * *',
 			async function () {
 
 				const joinReminder = new EmbedBuilder()
