@@ -115,35 +115,44 @@ client.on('messageCreate', msg => {
                     // Look at first 9 characters of email, check if it's a number
                     // See if last part of email is @newton.k12.ma.us
                     if (msg.content.match(/\d{9}@newton.k12.ma.us/)) {
+
                         // Create Schoology OAuth Process
                         SchoologyAuthenticate(msg)
-                            .then(displayName => {
+                            .then((information) => {
 
-                                // If they successfully authenticate, rename the student
+                                let displayName = information[0]
+                                let grade = information[1]
+
+                                // set discord username to actual name
                                 member.setNickname(displayName)
 
-                                /// Check if the student has a grade role
-                                if (!member.roles.cache.has(discord_ids["roles"]["senior"])
-                                    && !member.roles.cache.has(discord_ids["roles"]["junior"])
-                                    && !member.roles.cache.has(discord_ids["roles"]["sophomore"])
-                                    && !member.roles.cache.has(discord_ids["roles"]["freshman"])) {
-                                    const gradeEmbed = new EmbedBuilder()
-                                        .setTitle('Please select your grade')
-                                        .setColor(0x0099FF)
-                                        .addFields(
-                                            { name: 'Freshman', value: 'React with 🕘' },
-                                            { name: 'Sophomore', value: 'React with 🕙' },
-                                            { name: 'Junior', value: 'React with 🕚' },
-                                            { name: 'Senior', value: 'React with 🕛' });
-
-                                    msg.channel.send({ embeds: [gradeEmbed] })
-                                        .then(request => {
-                                            request.react('🕘')
-                                            request.react('🕙')
-                                            request.react('🕚')
-                                            request.react('🕛')
-                                        })
+                                // add proper grade role and remove New Member role
+                                let role
+                                if (grade === null) {
+                                    role = guild.roles.cache.get(discord_ids["roles"]["freshman"]);
+                                } else if (grade == 10) {
+                                    role = guild.roles.cache.get(discord_ids["roles"]["sophomore"]);
+                                } else if (grade == 11) {
+                                    role = guild.roles.cache.get(discord_ids["roles"]["junior"]);
+                                } else {
+                                    role = guild.roles.cache.get(discord_ids["roles"]["senior"]);
                                 }
+
+                                member.roles.remove(guild.roles.cache.get(discord_ids["roles"]["new-member"]))
+                                member.roles.add(role)
+
+                                // Send the user our welcome message
+                                const welcome = new EmbedBuilder()
+                                    .setColor(0x00AE86)
+                                    .setTitle('Welcome to nshs.life! You can check out the server now!')
+                                    .setDescription('If you would like to change your name, please DM @Admin')
+                                    .addFields({ name: 'Additional roles', value: 'Please take a look at the #role-assignment channel' })
+                                    .addFields({ name: 'Pumbaa commands', value: 'Use /help anywhere in the server to get slash commands' })
+                                    .addFields({ name: 'Server rules', value: '[rules.nshs.life](https://docs.google.com/document/u/5/d/e/2PACX-1vSJ1NB4b7RmcOWPEiDMXVQtug1nHvnzwaSjTvEBq_keDMVgDrut2aZxN6uGD8ccL8xMnvWFXIS8PT09/pub)' });
+
+                                member.send({ embeds: [welcome] })
+
+
                             })
                     }
                     // If they don't know what a school email is, DM them with an error
@@ -239,7 +248,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
 
             // Club-Seeker role
             if (reaction.emoji.name == '♣') {
-                const role = guild.roles.cache.get( discord_ids["roles"]["club-seeker"]);
+                const role = guild.roles.cache.get(discord_ids["roles"]["club-seeker"]);
                 guild.members.fetch(user.id)
                     .then(member => {
                         member.roles.add(role)
@@ -333,50 +342,6 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 })
             // DM reaction
         } else if (reaction.message.guildId === null && reaction.count == 2) {
-
-            // Grade handling
-            if (reaction.message.embeds[0].title.toString().includes('select your grade')) {
-                guild.members.fetch(user.id)
-                    .then(member => {
-                        // Freshman
-                        if (reaction.emoji.name == '🕘') {
-                            const role = guild.roles.cache.get(discord_ids["roles"]["freshman"]);
-                            member.roles.add(role)
-                        }
-
-                        // Sophomore
-                        if (reaction.emoji.name == '🕙') {
-                            const role = guild.roles.cache.get(discord_ids["roles"]["sophomore"]);
-                            member.roles.add(role)
-                        }
-
-                        // Junior
-                        if (reaction.emoji.name == '🕚') {
-                            const role = guild.roles.cache.get(discord_ids["roles"]["junior"]);
-                            member.roles.add(role)
-                        }
-
-                        // Senior
-                        if (reaction.emoji.name == '🕛') {
-                            const role = guild.roles.cache.get(discord_ids["roles"]["senior"]);
-                            member.roles.add(role)
-                        }
-                        // Remove the "New Member" role once the user has selected their grade
-                        member.roles.remove(guild.roles.cache.get(discord_ids["roles"]["new-member"]))
-                    })
-
-                // Send the user our welcome message once they select their grade
-                const welcome = new EmbedBuilder()
-                    .setColor(0x00AE86)
-                    .setTitle('Welcome to nshs.life! You can check out the server now!')
-                    .setDescription('If you would like to change your name, please DM @Admin')
-                    .addFields({ name: 'Additional roles', value: 'Please take a look at the #role-assignment channel' })
-                    .addFields({ name: 'Pumbaa commands', value: 'Use /help anywhere in the server to get slash commands' })
-                    .addFields({ name: 'Server rules', value: '[rules.nshs.life](https://docs.google.com/document/u/5/d/e/2PACX-1vSJ1NB4b7RmcOWPEiDMXVQtug1nHvnzwaSjTvEBq_keDMVgDrut2aZxN6uGD8ccL8xMnvWFXIS8PT09/pub)' });
-
-                user.send({ embeds: [welcome] })
-                reaction.message.delete()
-            }
 
             // Tutor confirmation handling
             if (reaction.message.embeds[0].title.toString().includes('accepted your tutor request')) {
@@ -531,37 +496,70 @@ client.on('voiceStateUpdate', async (oldState, newState) => {
         // When the people in the vc are the tutor and tutee, start the session
         const memberIds = Array.from(newState.channel.members.keys())
         if (memberIds.length == 2 && memberIds.includes(firstMsg.embeds[0].fields[2].value) && memberIds.includes(firstMsg.embeds[0].fields[3].value)) {
-            guild.channels.fetch(newState.channelId).then(channel => {
-                channel.send("@everyone This tutor session has started, only leave when you are sure that you're done")
+
+            guild.channels.fetch(discord_ids["channels"]["tutor-timestamps"]).then(logChannel => {
+
+                //get start time
+                const date = new Date();
+                startTime = date.toLocaleString('en-US', {
+                    timeZone: 'America/New_York',
+                })
+
+                const tutor = guild.members.cache.get(firstMsg.embeds[0].fields[2].value)
+                const tutee = guild.members.cache.get(firstMsg.embeds[0].fields[3].value)
+                const Embed = new EmbedBuilder()
+                    .setTitle(`Tutoring session started`)
+                    .setColor(0x0099FF)
+                    .addFields(
+                        { name: 'Meeting start', value: startTime },
+                        { name: 'Tutor', value: tutor.nickname ? tutor.nickname : tutor.user.username },
+                        { name: 'Tutee', value: tutee.nickname ? tutee.nickname : tutee.user.username });
+
+
+                //log the start time in tutor-timestamps channel
+                logChannel.send({ embeds: [Embed] })
+
+                guild.channels.fetch(newState.channelId).then(channel => {
+                    channel.send("@everyone This tutor session has started, only leave when you are sure that you're done")
+                })
             })
         }
 
     } else if (newState.channel === null) {
         try {
-            // Get first message (the bot's embed)
+            //get first message (the bot's embed)
             const fetchedMsg = await oldState.channel.messages.fetch({ after: 1, limit: 1 })
             const firstMsg = fetchedMsg.first()
 
-            // Possible people allowed
+            //possible people allowed
             const memberIds = [firstMsg.embeds[0].fields[2].value, firstMsg.embeds[0].fields[3].value]
-            // Whoever's left (tutee/tutor)
+            //whoever's left (tutee/tutor)
             const personLeft = Array.from(oldState.channel.members.keys())
             if (personLeft.length == 1 && memberIds.includes(oldState.id) && memberIds.includes(personLeft[0])) {
 
-                guild.channels.fetch(discord_ids["channels"]["tutor-timestamps"]).then(channel => {
-                    console.log(oldState)
+                guild.channels.fetch(discord_ids["channels"]["tutor-timestamps"]).then(logChannel => {
+
+                    //get end time
+                    const date = new Date();
+                    endTime = date.toLocaleString('en-US', {
+                        timeZone: 'America/New_York',
+                    })
+
                     const tutor = guild.members.cache.get(memberIds[0])
                     const tutee = guild.members.cache.get(memberIds[1])
                     const Embed = new EmbedBuilder()
                         .setTitle(`Tutoring session ended`)
-                        .setColor(0x0099FF);
-                    // .addFields(
-                    // 	{ name: 'Meeting end time', value: 'nope' },
-                    // 	{ name: 'Tutor', value: tutor.nickname ? tutor.nickname : tutor.username },
-                    // 	{ name: 'Tutee', value: tutee.nickname ? tutee.nickname : tutee.username });
-                    channel.send({ embeds: [Embed] })
-                    guild.channels.fetch(oldState.channelId).then(channel => {
-                        channel.delete()
+                        .setColor(0x0099FF)
+                        .addFields(
+                            { name: 'Meeting end time', value: endTime },
+                            { name: 'Tutor', value: tutor.nickname ? tutor.nickname : tutor.user.username },
+                            { name: 'Tutee', value: tutee.nickname ? tutee.nickname : tutee.user.username });
+
+                    //log the end time in tutor-timestamps channel
+                    logChannel.send({ embeds: [Embed] })
+
+                    guild.channels.fetch(oldState.channelId).then(tutoringChannel => {
+                        tutoringChannel.delete()
                     })
                 })
             }
