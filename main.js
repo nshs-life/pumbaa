@@ -126,7 +126,7 @@ client.on('messageCreate', msg => {
                                 // set discord username to actual name
                                 member.setNickname(displayName)
 
-                                // add proper grade role and remove New Member role
+                                // detect grade
                                 let role
                                 if (grade == 10) {
                                     role = guild.roles.cache.get(discord_ids["roles"]["sophomore"]);
@@ -138,21 +138,24 @@ client.on('messageCreate', msg => {
                                     role = guild.roles.cache.get(discord_ids["roles"]["freshman"]);
                                 }
 
-                                member.roles.remove(guild.roles.cache.get(discord_ids["roles"]["new-member"]))
-                                member.roles.add(role)
+                                //assign grade role
+                                member.roles.remove(guild.roles.cache.get(discord_ids["roles"]["new-member"])).then(() => {
+                                    member.roles.add(role).then(() => {
 
-                                // Send the user our welcome message
-                                const welcome = new EmbedBuilder()
-                                    .setColor(0x008B6B)
-                                    .setTitle('Welcome to nshs.life! You can check out the server now!')
-                                    .setDescription('If you would like to change your name, please DM @Admin')
-                                    .addFields({ name: 'Additional roles', value: 'Please take a look at the #role-assignment channel' })
-                                    .addFields({ name: 'Pumbaa commands', value: 'Use /help anywhere in the server to get slash commands' })
-                                    .addFields({ name: 'Server rules', value: '[rules.nshs.life](https://docs.google.com/document/u/5/d/e/2PACX-1vSJ1NB4b7RmcOWPEiDMXVQtug1nHvnzwaSjTvEBq_keDMVgDrut2aZxN6uGD8ccL8xMnvWFXIS8PT09/pub)' });
+                                        // Send the user our welcome message
+                                        const welcome = new EmbedBuilder()
+                                            .setColor(0x008B6B)
+                                            .setTitle('Welcome to nshs.life! You can check out the server now!')
+                                            .setDescription('If you would like to change your name, please DM @Admin')
+                                            .addFields({ name: 'Additional roles', value: 'Please take a look at the #role-assignment channel' })
+                                            .addFields({ name: 'Pumbaa commands', value: 'Use /help anywhere in the server to get slash commands' })
+                                            .addFields({ name: 'Server rules', value: '[rules.nshs.life](https://docs.google.com/document/u/5/d/e/2PACX-1vSJ1NB4b7RmcOWPEiDMXVQtug1nHvnzwaSjTvEBq_keDMVgDrut2aZxN6uGD8ccL8xMnvWFXIS8PT09/pub)' });
 
-                                member.send({ embeds: [welcome] })
+                                        member.send({ embeds: [welcome] })
+                                    })
+                                })
 
-                                //session times out
+                                //session timed out error
                             }).catch(err => {
                                 const errorEmbed = new EmbedBuilder()
                                     .setTitle('Verification Timed Out')
@@ -255,6 +258,15 @@ client.on('messageReactionAdd', async (reaction, user) => {
             // Club-Seeker role
             if (reaction.emoji.name == '♣') {
                 const role = guild.roles.cache.get(discord_ids["roles"]["club-seeker"]);
+                guild.members.fetch(user.id)
+                    .then(member => {
+                        member.roles.add(role)
+                    })
+            }
+
+            // Memes role
+            if (reaction.emoji.name == '😆') {
+                const role = guild.roles.cache.get(discord_ids["roles"]["memes"]);
                 guild.members.fetch(user.id)
                     .then(member => {
                         member.roles.add(role)
@@ -471,6 +483,15 @@ client.on('messageReactionRemove', async (reaction, user) => {
         // Remove Club-Seeker role
         if (reaction.emoji.name == '♣') {
             const role = guild.roles.cache.get(discord_ids["roles"]["club-seeker"]);
+            guild.members.fetch(user.id)
+                .then(member => {
+                    member.roles.remove(role)
+                })
+        }
+
+        // Remove Club-Seeker role
+        if (reaction.emoji.name == '😆') {
+            const role = guild.roles.cache.get(discord_ids["roles"]["memes"]);
             guild.members.fetch(user.id)
                 .then(member => {
                     member.roles.remove(role)
