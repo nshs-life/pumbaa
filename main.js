@@ -139,9 +139,9 @@ client.on('messageCreate', msg => {
                                 }
 
                                 //assign grade role
-                                member.roles.remove(guild.roles.cache.get(discord_ids["roles"]["new-member"])).then(() => {
-                                    member.roles.add(role).then(() => {
-
+                                member.roles.remove(guild.roles.cache.get(discord_ids["roles"]["new-member"]))
+                            
+                                member.roles.add(role)
                                         // Send the user our welcome message
                                         const welcome = new EmbedBuilder()
                                             .setColor(0x008B6B)
@@ -152,7 +152,7 @@ client.on('messageCreate', msg => {
                                             .addFields({ name: 'Server rules', value: '[rules.nshs.life](https://docs.google.com/document/u/5/d/e/2PACX-1vSJ1NB4b7RmcOWPEiDMXVQtug1nHvnzwaSjTvEBq_keDMVgDrut2aZxN6uGD8ccL8xMnvWFXIS8PT09/pub)' });
 
                                         member.send({ embeds: [welcome] })
-                                    })
+                                   
                                 })
 
                                 //session timed out error
