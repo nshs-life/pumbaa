@@ -139,22 +139,20 @@ client.on('messageCreate', msg => {
                                 }
 
                                 //assign grade role
-                                member.roles.remove(guild.roles.cache.get(discord_ids["roles"]["new-member"])).then(() => {
-                                    member.roles.add(role).then(() => {
+                                member.roles.remove(guild.roles.cache.get(discord_ids["roles"]["new-member"]))
+                            
+                                member.roles.add(role)
+                                // Send the user our welcome message
+                                const welcome = new EmbedBuilder()
+                                    .setColor(0x008B6B)
+                                    .setTitle('Welcome to nshs.life! You can check out the server now!')
+                                    .setDescription('If you would like to change your name, please DM @Admin')
+                                    .addFields({ name: 'Additional roles', value: 'Please take a look at the #role-assignment channel' })
+                                    .addFields({ name: 'Pumbaa commands', value: 'Use /help anywhere in the server to get slash commands' })
+                                    .addFields({ name: 'Server rules', value: '[rules.nshs.life](https://docs.google.com/document/u/5/d/e/2PACX-1vSJ1NB4b7RmcOWPEiDMXVQtug1nHvnzwaSjTvEBq_keDMVgDrut2aZxN6uGD8ccL8xMnvWFXIS8PT09/pub)' });
 
-                                        // Send the user our welcome message
-                                        const welcome = new EmbedBuilder()
-                                            .setColor(0x008B6B)
-                                            .setTitle('Welcome to nshs.life! You can check out the server now!')
-                                            .setDescription('If you would like to change your name, please DM @Admin')
-                                            .addFields({ name: 'Additional roles', value: 'Please take a look at the #role-assignment channel' })
-                                            .addFields({ name: 'Pumbaa commands', value: 'Use /help anywhere in the server to get slash commands' })
-                                            .addFields({ name: 'Server rules', value: '[rules.nshs.life](https://docs.google.com/document/u/5/d/e/2PACX-1vSJ1NB4b7RmcOWPEiDMXVQtug1nHvnzwaSjTvEBq_keDMVgDrut2aZxN6uGD8ccL8xMnvWFXIS8PT09/pub)' });
-
-                                        member.send({ embeds: [welcome] })
-                                    })
-                                })
-
+                                member.send({ embeds: [welcome] })
+                                   
                                 //session timed out error
                             }).catch(err => {
 
