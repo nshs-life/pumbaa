@@ -155,7 +155,6 @@ client.on('messageCreate', msg => {
                                    
                                 //session timed out error
                             }).catch(err => {
-<<<<<<< HEAD
 
                                     const errorEmbed = new EmbedBuilder()
                                         .setTitle('Verification Timed Out')
@@ -163,14 +162,6 @@ client.on('messageCreate', msg => {
                                         .setDescription('The Schoology authentication process has timed out (60 seconds). Please message me your school email (example@newton.k12.ma.us) again to re-verify.')
                                     msg.channel.send({ embeds: [errorEmbed] })
                                
-
-=======
-                                const errorEmbed = new EmbedBuilder()
-                                    .setTitle('Verification Timed Out')
-                                    .setColor(0xFF0000)
-                                    .setDescription('The Schoology authentication process has timed out (60 seconds). Please message me your school email (example@newton.k12.ma.us) again to re-verify.')
-                                msg.channel.send({ embeds: [errorEmbed] })
->>>>>>> parent of 98b0533 (nps student validation + tutor confirmation embeds)
                             })
                     }
                     // If they don't know what a school email is, DM them with an error
