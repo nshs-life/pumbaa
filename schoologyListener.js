@@ -45,13 +45,13 @@ module.exports = {
 
                 //verification timed out
                 if (listener_data['timeout'] == 'true') {
-                    return reject(0);
+                    return reject('verification timed out');
                     // Go through the restart process
                 }
 
                 //non nps student
                 if (listener_data['student'] == 'false') {
-                    return reject(1)
+                    return reject('non student')
                 }
             });
         });

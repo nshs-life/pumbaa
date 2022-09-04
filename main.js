@@ -157,7 +157,7 @@ client.on('messageCreate', msg => {
                             }).catch(err => {
 
                                 //timeout error
-                                if (err == 0) {
+                                if (err === 'verification timed out') {
                                     const errorEmbed = new EmbedBuilder()
                                         .setTitle('Verification Timed Out')
                                         .setColor(0xFF0000)
@@ -166,7 +166,7 @@ client.on('messageCreate', msg => {
                                 }
 
                                 //non-student error
-                                if (err == 1) {
+                                if (err === 'non student') {
                                     const errorEmbed = new EmbedBuilder()
                                         .setTitle('Non NPS Student')
                                         .setColor(0xFF0000)
