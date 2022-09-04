@@ -43,15 +43,9 @@ module.exports = {
             pythonProcess.stderr.on('data', (data) => {
                 let listener_data = JSON.parse(data.toString());
 
-                //verification timed out
                 if (listener_data['timeout'] == 'true') {
-                    return reject('verification timed out');
+                    return reject();
                     // Go through the restart process
-                }
-
-                //non nps student
-                if (listener_data['student'] == 'false') {
-                    return reject('non student')
                 }
             });
         });
