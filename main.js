@@ -162,13 +162,12 @@ client.on('messageCreate', msg => {
                                         .setDescription('The Schoology authentication process has timed out (60 seconds). Please message me your school email (example@newton.k12.ma.us) again to re-verify.')
                                     msg.channel.send({ embeds: [errorEmbed] })
                                
-
                             })
                     }
                     // If they don't know what a school email is, DM them with an error
                     else {
                         const loginReqEmbed = new EmbedBuilder()
-                            .setTitle('Please type out your NPS email in this dm')
+                            .setTitle('Please type out your nps email in this dm')
                         msg.channel.send({ embeds: [loginReqEmbed] })
                     }
                     // If they're already a member:
@@ -310,10 +309,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                     if (member.user.id == user.id) {
                         reaction.users.remove(user.id)
                         // Deny tutor request acceptance since they're the one asking for it
-                        const errorEmbed = new EmbedBuilder()
-                            .setTitle("Sorry, this isn't a self-tutor system")
-                            .setColor(0xFF0000)
-                        user.send({ embeds: [errorEmbed] })
+                        return user.send("Sorry, this isn't a self-tutor system")
                     } else {
                         // Note: Emoji count tracks whether or not a tutor request has been accepted or not.
 
@@ -328,11 +324,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                         // That means the request has already been fufilled
                         if (emojiCount > 2) {
                             reaction.users.remove(user.id)
-
-                            const errorEmbed = new EmbedBuilder()
-                                .setTitle('Somebody already reached out to help ' + requestorName)
-                                .setColor(0xFF0000)
-                            user.send({ embeds: [errorEmbed] })
+                            return user.send('Somebody already reached out to help ' + requestorName);
                         }
 
                         // Accepting the tutor request
