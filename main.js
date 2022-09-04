@@ -161,7 +161,6 @@ client.on('messageCreate', msg => {
                                         .setColor(0xFF0000)
                                         .setDescription('The Schoology authentication process has timed out (60 seconds). Please message me your school email (example@newton.k12.ma.us) again to re-verify.')
                                     msg.channel.send({ embeds: [errorEmbed] })
-                               
                             })
                     }
                     // If they don't know what a school email is, DM them with an error
