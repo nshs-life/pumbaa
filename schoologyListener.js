@@ -44,11 +44,7 @@ module.exports = {
                 let listener_data = JSON.parse(data.toString());
 
                 if (listener_data['timeout'] == 'true') {
-<<<<<<< HEAD
                     return reject();
-=======
-                    return reject('Authorization timed out.');
->>>>>>> parent of 98b0533 (nps student validation + tutor confirmation embeds)
                     // Go through the restart process
                 }
             });
