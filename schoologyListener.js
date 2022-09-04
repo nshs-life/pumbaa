@@ -45,7 +45,7 @@ module.exports = {
 
                 //verification timed out
                 if (listener_data['timeout'] == 'true') {
-                    return reject('verification timed out');
+                    return reject();
                     // Go through the restart process
                 }
             });
