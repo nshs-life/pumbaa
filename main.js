@@ -156,23 +156,12 @@ client.on('messageCreate', msg => {
                                 //session timed out error
                             }).catch(err => {
 
-                                //timeout error
-                                if (err === 'verification timed out') {
                                     const errorEmbed = new EmbedBuilder()
                                         .setTitle('Verification Timed Out')
                                         .setColor(0xFF0000)
                                         .setDescription('The Schoology authentication process has timed out (60 seconds). Please message me your school email (example@newton.k12.ma.us) again to re-verify.')
                                     msg.channel.send({ embeds: [errorEmbed] })
-                                }
-
-                                //non-student error
-                                if (err === 'non student') {
-                                    const errorEmbed = new EmbedBuilder()
-                                        .setTitle('Non NPS Student')
-                                        .setColor(0xFF0000)
-                                        .setDescription("Sorry, only NSHS students are allowed in the server. Please contact a moderator if there's an issue")
-                                    msg.channel.send({ embeds: [errorEmbed] })
-                                }
+                               
 
                             })
                     }
