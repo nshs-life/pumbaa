@@ -4,14 +4,44 @@ const { discordIDSwitcher } = require('../helper.js');
 
 let discord_ids = discordIDSwitcher();
 
+const fs = require('node:fs');
+const path = require('node:path');
+const { REST } = require('@discordjs/rest');
+const { Routes } = require('discord.js');
+
+const { config_load } = require('../helper.js');
+const { DISCORD_CLIENT_ID, DISCORD_SERVER_ID, DISCORD_TOKEN } = config_load();
+
 module.exports = {
 	name: 'ready',
 	once: true,
 	execute(client) {
+
+		//logged in
 		console.log(`nshs.life.bot logged in as ${client.user.tag}`);
 
+		//set bot's activity
 		client.user.setActivity('Hakuna Matata', { type: ActivityType.Listening });
 
+		//registering commands
+		const commands = [];
+		const commandsPath = path.join(__dirname, '../commands');
+		const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
+
+		for (const file of commandFiles) {
+			const filePath = path.join(commandsPath, file);
+			const command = require(filePath);
+			commands.push(command.data.toJSON());
+		}
+
+		const rest = new REST({ version: '10' }).setToken(DISCORD_TOKEN);
+
+		rest.put(Routes.applicationGuildCommands(DISCORD_CLIENT_ID, DISCORD_SERVER_ID), { body: commands })
+			.then(() => console.log('Successfully registered application commands.'))
+			.catch(console.error);
+
+
+		//send out intial messages
 		const roleEmbed = new EmbedBuilder()
 			.setTitle('Choosing optional server roles')
 			.setColor(0x0099FF)
@@ -61,7 +91,7 @@ module.exports = {
 					aboutChannel.send({ embeds: [aboutEmbed] })
 				}
 			})
-		
+
 		//send message at 9am and 9pm prompting new users to verify schoology
 		let scheduledMessage = new CronJob(
 			'20 4 * * *',
@@ -88,6 +118,6 @@ module.exports = {
 			true,
 			'America/New_York'
 		);
-		
+
 	},
 };
