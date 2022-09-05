@@ -120,47 +120,53 @@ client.on('messageCreate', msg => {
                         SchoologyAuthenticate(msg)
                             .then((information) => {
 
-                                let displayName = information[0]
-                                let grade = information[1]
+                                if (information[2] == 'true') {
+                                    let displayName = information[0]
+                                    let grade = information[1]
 
-                                // set discord username to actual name
-                                member.setNickname(displayName)
+                                    // set discord username to actual name
+                                    member.setNickname(displayName)
 
-                                // detect grade
-                                let role
-                                if (grade == 10) {
-                                    role = guild.roles.cache.get(discord_ids["roles"]["sophomore"]);
-                                } else if (grade == 11) {
-                                    role = guild.roles.cache.get(discord_ids["roles"]["junior"]);
-                                } else if (grade == 12) {
-                                    role = guild.roles.cache.get(discord_ids["roles"]["senior"]);
+                                    // detect grade
+                                    let role
+                                    if (grade == 10) {
+                                        role = guild.roles.cache.get(discord_ids["roles"]["sophomore"]);
+                                    } else if (grade == 11) {
+                                        role = guild.roles.cache.get(discord_ids["roles"]["junior"]);
+                                    } else if (grade == 12) {
+                                        role = guild.roles.cache.get(discord_ids["roles"]["senior"]);
+                                    } else {
+                                        role = guild.roles.cache.get(discord_ids["roles"]["freshman"]);
+                                    }
+
+                                    //assign grade role
+                                    member.roles.remove(guild.roles.cache.get(discord_ids["roles"]["new-member"]))
+
+                                    member.roles.add(role)
+                                    // Send the user our welcome message
+                                    const welcome = new EmbedBuilder()
+                                        .setColor(0x008B6B)
+                                        .setTitle('Welcome to nshs.life! You can check out the server now!')
+                                        .setDescription('If you would like to change your name, please DM @Admin')
+                                        .addFields({ name: 'Additional roles', value: 'Please take a look at the #role-assignment channel' })
+                                        .addFields({ name: 'Pumbaa commands', value: 'Use /help anywhere in the server to get slash commands' })
+                                        .addFields({ name: 'Server rules', value: '[rules.nshs.life](https://docs.google.com/document/u/5/d/e/2PACX-1vSJ1NB4b7RmcOWPEiDMXVQtug1nHvnzwaSjTvEBq_keDMVgDrut2aZxN6uGD8ccL8xMnvWFXIS8PT09/pub)' });
+
+                                    member.send({ embeds: [welcome] })
                                 } else {
-                                    role = guild.roles.cache.get(discord_ids["roles"]["freshman"]);
+                                    const error = new EmbedBuilder()
+                                        .setTitle("Only NSHS students and alumni are allowed. Please contact an @Admin if there's an issue.")
+                                        .setColor(0xFF0000);
+                                    user.send({ embeds: [error] })
                                 }
-
-                                //assign grade role
-                                member.roles.remove(guild.roles.cache.get(discord_ids["roles"]["new-member"]))
-                            
-                                member.roles.add(role)
-                                // Send the user our welcome message
-                                const welcome = new EmbedBuilder()
-                                    .setColor(0x008B6B)
-                                    .setTitle('Welcome to nshs.life! You can check out the server now!')
-                                    .setDescription('If you would like to change your name, please DM @Admin')
-                                    .addFields({ name: 'Additional roles', value: 'Please take a look at the #role-assignment channel' })
-                                    .addFields({ name: 'Pumbaa commands', value: 'Use /help anywhere in the server to get slash commands' })
-                                    .addFields({ name: 'Server rules', value: '[rules.nshs.life](https://docs.google.com/document/u/5/d/e/2PACX-1vSJ1NB4b7RmcOWPEiDMXVQtug1nHvnzwaSjTvEBq_keDMVgDrut2aZxN6uGD8ccL8xMnvWFXIS8PT09/pub)' });
-
-                                member.send({ embeds: [welcome] })
-                                   
                                 //session timed out error
                             }).catch(err => {
 
-                                    const errorEmbed = new EmbedBuilder()
-                                        .setTitle('Verification Timed Out')
-                                        .setColor(0xFF0000)
-                                        .setDescription('The Schoology authentication process has timed out (60 seconds). Please message me your school email (example@newton.k12.ma.us) again to re-verify.')
-                                    msg.channel.send({ embeds: [errorEmbed] })
+                                const errorEmbed = new EmbedBuilder()
+                                    .setTitle('Verification Timed Out')
+                                    .setColor(0xFF0000)
+                                    .setDescription('The Schoology authentication process has timed out (60 seconds). Please message me your school email (example@newton.k12.ma.us) again to re-verify.')
+                                msg.channel.send({ embeds: [errorEmbed] })
                             })
                     }
                     // If they don't know what a school email is, DM them with an error
@@ -307,8 +313,12 @@ client.on('messageReactionAdd', async (reaction, user) => {
                     // Check if the person reacting to the tutor request is the person requesting it
                     if (member.user.id == user.id) {
                         reaction.users.remove(user.id)
+
                         // Deny tutor request acceptance since they're the one asking for it
-                        return user.send("Sorry, this isn't a self-tutor system")
+                        const error = new EmbedBuilder()
+                            .setTitle("Sorry, this isn't a self-tutor system")
+                            .setColor(0xFF0000);
+                        user.send({ embeds: [error] })
                     } else {
                         // Note: Emoji count tracks whether or not a tutor request has been accepted or not.
 
@@ -323,7 +333,10 @@ client.on('messageReactionAdd', async (reaction, user) => {
                         // That means the request has already been fufilled
                         if (emojiCount > 2) {
                             reaction.users.remove(user.id)
-                            return user.send('Somebody already reached out to help ' + requestorName);
+                            const error = new EmbedBuilder()
+                                .setTitle('Somebody already reached out to help ' + requestorName)
+                                .setColor(0xFF0000);
+                            user.send({ embeds: [error] })
                         }
 
                         // Accepting the tutor request
