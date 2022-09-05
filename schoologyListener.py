@@ -18,11 +18,11 @@ class SchoologyData:
     grade: str = "null"
 
     def json(self):
-        info =  "{"
+        info =  "{\n"
 
         for name, state in self.__dict__.items():
             info += f'"{name}": "{state if type(state) == str else str(state).lower()}",\n'
-        info = info[:-2] + "}"
+        info = info[:-2] + "\n}"
 
         return info
 

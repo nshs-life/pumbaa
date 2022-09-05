@@ -33,9 +33,10 @@ module.exports = {
                 if (listener_data['authorization'] == 'true') {
                     // console.log('Authorization successful!');
                     let display_name = listener_data['display_name'];
-                    let grade = listener_data['grade'];
+                    let grade = listener_data['grade']
+                    let isStudent = listener_data['student'];
                     
-                    return resolve([display_name, grade])
+                    return resolve([display_name, grade, isStudent])
                 }
             });
 
