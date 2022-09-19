@@ -51,6 +51,7 @@ module.exports = {
 				{ name: 'Opportunity updates ping', value: 'React with 🔎' },
 				{ name: 'Club updates ping', value: 'React with ♣' },
 				{ name: 'Access to memes channel', value: 'React with 😆' },
+				{ name: 'Access to gaming channel', value: 'React with 🎮' },
 				{ name: 'She/Her', value: 'React with 💛' },
 				{ name: 'They/Them', value: 'React with 💗' },
 				{ name: 'He/Him', value: 'React with 💚' });
@@ -68,6 +69,7 @@ module.exports = {
 							request.react('🔎')
 							request.react('♣')
 							request.react('😆')
+							request.react('🎮')
 							request.react('💛')
 							request.react('💗')
 							request.react('💚')
