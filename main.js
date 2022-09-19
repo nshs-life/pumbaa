@@ -278,6 +278,15 @@ client.on('messageReactionAdd', async (reaction, user) => {
                     })
             }
 
+            // Gamer role
+            if (reaction.emoji.name == '🎮') {
+                const role = guild.roles.cache.get(discord_ids["roles"]["gamer"]);
+                guild.members.fetch(user.id)
+                    .then(member => {
+                        member.roles.add(role)
+                    })
+            }
+
             // They/Them role
             if (reaction.emoji.name == '💗') {
                 const role = guild.roles.cache.get(discord_ids["roles"]["they/them"]);
@@ -501,9 +510,18 @@ client.on('messageReactionRemove', async (reaction, user) => {
                 })
         }
 
-        // Remove Club-Seeker role
+        // Remove Memes role
         if (reaction.emoji.name == '😆') {
             const role = guild.roles.cache.get(discord_ids["roles"]["memes"]);
+            guild.members.fetch(user.id)
+                .then(member => {
+                    member.roles.remove(role)
+                })
+        }
+
+        // Remove Gamer role
+        if (reaction.emoji.name == '🎮') {
+            const role = guild.roles.cache.get(discord_ids["roles"]["gamer"]);
             guild.members.fetch(user.id)
                 .then(member => {
                     member.roles.remove(role)
