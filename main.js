@@ -139,10 +139,10 @@ client.on('messageCreate', msg => {
                                         role = guild.roles.cache.get(discord_ids["roles"]["freshman"]);
                                     }
 
-                                    //assign grade role
-                                    member.roles.remove(guild.roles.cache.get(discord_ids["roles"]["new-member"]))
-
+                                    //assign grade role then remove new member role
                                     member.roles.add(role)
+                                    member.roles.remove(guild.roles.cache.get(discord_ids["roles"]["new-member"]))
+                                    
                                     // Send the user our welcome message
                                     const welcome = new EmbedBuilder()
                                         .setColor(0x008B6B)
