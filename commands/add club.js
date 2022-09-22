@@ -28,33 +28,6 @@ module.exports = {
                     { name: 'Fun', value: 'Fun' },
                 ))
 
-        .addStringOption(option =>
-            option.setName('tagtwo')
-                .setDescription("What category does the club belong to?")
-                .addChoices(
-                    { name: 'None', value: 'None' },
-                    { name: 'Affinity', value: 'Affinity' },
-                    { name: 'Competitive', value: 'Competitive' },
-                    { name: 'STEM', value: 'STEM' },
-                    { name: 'Humanities', value: 'Humanities' },
-                    { name: 'Public Speaking', value: 'Public Speaking' },
-                    { name: 'Fun', value: 'Fun' },
-                )
-                .setRequired(true))
-
-        .addStringOption(option =>
-            option.setName('tagthree')
-                .setDescription("What category does the club belong to?")
-                .addChoices(
-                    { name: 'None', value: 'None' },
-                    { name: 'Affinity', value: 'Affinity' },
-                    { name: 'Competitive', value: 'Competitive' },
-                    { name: 'STEM', value: 'STEM' },
-                    { name: 'Humanities', value: 'Humanities' },
-                    { name: 'Public Speaking', value: 'Public Speaking' },
-                    { name: 'Fun', value: 'Fun' },
-                )
-                .setRequired(true))
 
         //leader of the club
         .addStringOption(option =>
@@ -68,23 +41,48 @@ module.exports = {
                 .setDescription('What does the club do?')
                 .setRequired(true))
 
+        //meeting times
+        .addStringOption(option =>
+            option.setName('meetingtime')
+                .setDescription("When does the club meet?")
+                .setRequired(true))
+
+        //meeting room
+        .addStringOption(option =>
+            option.setName('meetingroom')
+                .setDescription("What room does the club meet in?")
+                .setRequired(true))
+
+        //club advisor
+        .addStringOption(option =>
+            option.setName('advisor')
+                .setDescription("Who is the teacher advising the club?")
+                .setRequired(true))
+
         //club member count
-        .addIntegerOption(option =>
+        .addStringOption(option =>
             option.setName('size')
                 .setDescription('How many people are in the club?')
-                .setRequired(true)),
+                .setRequired(true)
+                .addChoices(
+                    { name: '1-5', value: '1-5' },
+                    { name: '6-10', value: '6-10' },
+                    { name: '11-20', value: '11-20' },
+                    { name: '21-30', value: '21-30' },
+                    { name: '30+', value: '30+' },
+                )),
 
     async execute(interaction) {
 
         const name = interaction.options.getString('name')
-        const tag1 = interaction.options.getString('tag')
-        const tag2 = interaction.options.getString('tagtwo')
-        const tag3 = interaction.options.getString('tagthree')
+        const category = interaction.options.getString('tag')
         const leader = interaction.options.getString('leaders')
         const description = interaction.options.getString('description')
-        const size = interaction.options.getInteger('size')
+        const time = interaction.options.getString('meetingtime')
+        const room = interaction.options.getString('meetingroom')
+        const advisor = interaction.options.getString('advisor')
+        const size = interaction.options.getString('size')
 
-        let category = tag1 + ", " + tag2 + ", " + tag3
         //format embed
         const clubEmbed = new EmbedBuilder()
             .setTitle('New club that needs approval')
@@ -95,7 +93,10 @@ module.exports = {
                 { name: 'Category', value: category },
                 { name: 'Leader(s)', value: leader },
                 { name: 'Description', value: description },
-                { name: 'Member count', value: String(size)});
+                { name: 'Meeting Times', value: time },
+                { name: 'Meeting Room', value: room },
+                { name: 'Advisor', value: advisor },
+                { name: 'Member count', value: size });
 
         //post request to verify-club
         interaction.guild.channels.fetch(discord_ids["channels"]["verify-club"])
