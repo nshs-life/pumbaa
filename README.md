@@ -6,7 +6,7 @@ Hakuna Matata!
 </h2>
 
 <h3 align="center">
-Covering the needs of the <a href="http://nshs.life/">nshs.life</a> community.
+Covering the needs of the <a href="https://www.nshs.life/">nshs.life</a> community.
 </h3>
 
 ## What does Pumbaa do?
