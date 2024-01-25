@@ -4,6 +4,7 @@ import schoolopy
 import sys
 import time
 from enum import Enum
+from datetime import datetime
 
 TIMEOUT = 60
 
@@ -26,15 +27,22 @@ class SchoologyData:
 
         return info
 
+# defines the grades based off of graduating class
 class Grades(dict[int, str]):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+        if datetime.now().month > 8:
+            grad_year = datetime.now().year + 1
+        else:
+            grad_year = datetime.now().year
+
         self.__dict__ = self
         self.update({
-            "2023": "12",
-            "2024": "11",
-            "2025": "10",
-            "2026": "9",
+            str(grad_year): "12",
+            str(grad_year-1): "11",
+            str(grad_year-2): "10",
+            str(grad_year-3): "9",
         })
 
     
