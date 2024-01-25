@@ -8,7 +8,7 @@ const keepAlive = require('./server');
 const { SchoologyAuthenticate } = require('./schoologyListener.js');
 const { discordIDSwitcher, config_load } = require('./helper.js');
 
-const { DISCORD_TOKEN } = config_load();
+const { DISCORD_TOKEN, quotesAPIKey } = config_load();
 
 const discord_ids = discordIDSwitcher();
 
@@ -177,18 +177,21 @@ client.on('messageCreate', msg => {
                     }
                     // If they're already a member:
                 } else {
-                    // Send them a cute quote
-                    fetch("https://type.fit/api/quotes")
-                        .then(function (response) {
+                    // Send them a quote                    
+                    fetch("https://api.api-ninjas.com/v1/quotes", {
+                        method: 'GET',
+                        headers: {
+                            'X-API-Key': quotesAPIKey
+                        }
+                        }).then(function (response) {
                             return response.json();
                         })
                         .then(function (data) {
-
                             const quote = data[Math.floor(Math.random() * data.length)]
                             const Embed = new EmbedBuilder()
                                 .setTitle("Hello! Here's a quote for you to think about")
                                 .setColor("#14499c")
-                                .addFields({ name: quote.text, value: `- ${quote.author ? quote.author : 'unknown'} ` })
+                                .addFields({ name: quote.quote, value: `- ${quote.author ? quote.author : 'unknown'} ` })
                             msg.channel.send({ embeds: [Embed] })
                         })
                         // If the quote fails, DM them with a "You're already a member" message
