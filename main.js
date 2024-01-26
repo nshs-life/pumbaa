@@ -141,6 +141,7 @@ client.on('messageCreate', msg => {
 
                                     //assign grade role then remove new member role
                                     member.roles.add(role)
+                                    member.roles.add(discord_ids["roles"]["student"])
                                     member.roles.remove(guild.roles.cache.get(discord_ids["roles"]["new-member"]))
                                     
                                     // Send the user our welcome message

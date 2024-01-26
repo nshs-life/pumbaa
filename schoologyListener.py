@@ -40,9 +40,9 @@ class Grades(dict[int, str]):
         self.__dict__ = self
         self.update({
             str(grad_year): "12",
-            str(grad_year-1): "11",
-            str(grad_year-2): "10",
-            str(grad_year-3): "9",
+            str(grad_year+1): "11",
+            str(grad_year+2): "10",
+            str(grad_year+3): "9",
         })
 
     
