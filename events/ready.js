@@ -120,7 +120,7 @@ module.exports = {
 		);
 
 		let weeklyUpdate = new CronJob(
-			'0 16 * * 7', // 4pm Sunday send
+			'0 16 * * 0', // 4pm Sunday send
 			async function () {
 
 				let url = await getLatestUpdateURL();
