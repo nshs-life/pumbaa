@@ -10,14 +10,14 @@ module.exports = {
     },
 
     discordIDSwitcher: function() {
-        const { BOTNAME } = process.env
-        if (BOTNAME == "Pumbaa") {
+        // const { BOTNAME } = process.env
+        // if (BOTNAME == "Pumbaa") {
             discord_ids = require('./discord-ids.json');
             ids = discord_ids.pumbaa;
-        } else {
-            discord_ids = require('./discord-ids.json');
-            ids = discord_ids.simba;
-        }
+        // } else {
+        //     discord_ids = require('./discord-ids.json');
+        //     ids = discord_ids.simba;
+        // }
 
         return ids;
     }
