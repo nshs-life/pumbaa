@@ -12,6 +12,9 @@ const { Routes } = require('discord.js');
 const { config_load } = require('../helper.js');
 const { DISCORD_CLIENT_ID, DISCORD_SERVER_ID, DISCORD_TOKEN } = config_load();
 
+const fetch = require('node-fetch');
+const cheerio = require('cheerio');
+
 module.exports = {
 	name: 'ready',
 	once: true,
@@ -22,6 +25,7 @@ module.exports = {
 
 		//set bot's activity
 		client.user.setActivity('Hakuna Matata', { type: ActivityType.Listening });
+		const guild = client.guilds.cache.get(discord_ids["server"])
 
 		//registering commands
 		const commands = [];
@@ -85,11 +89,9 @@ module.exports = {
 				{ name: 'Our Rules', value: '[rules.nshs.life](https://docs.google.com/document/u/5/d/e/2PACX-1vSJ1NB4b7RmcOWPEiDMXVQtug1nHvnzwaSjTvEBq_keDMVgDrut2aZxN6uGD8ccL8xMnvWFXIS8PT09/pub)' });
 
 		let aboutChannel = client.channels.cache.get(discord_ids["channels"]["about"])
-
 		aboutChannel.messages.fetch()
 			.then(msgs => {
 				if (msgs.size < 1) {
-					//post request to tutors
 					aboutChannel.send({ embeds: [aboutEmbed] })
 				}
 			})
@@ -105,8 +107,6 @@ module.exports = {
 					.setColor(0x0099FF)
 
 				//send reminder to people with new member role
-				let guild = client.guilds.cache.get(discord_ids["server"])
-
 				members = await guild.members.fetch()
 				members.forEach((member) => {
 					if (member.roles.cache.has(discord_ids["roles"]["new-member"])) {
@@ -115,11 +115,85 @@ module.exports = {
 				});
 			},
 			null,
-
-			//start command
-			true,
+			true, //start command
 			'America/New_York'
 		);
 
+		let weeklyUpdate = new CronJob(
+			'0 16 * * 7', // 4pm Sunday send
+			async function () {
+
+				let url = await getLatestUpdateURL();
+				const week = getNewWeek()
+				if (url.includes(week)) {
+					url = url.replace('#flyer-analytics', '')
+					const response = await fetch(url);
+					const body = await response.text();
+					const $ = cheerio.load(body);
+
+					// what color week it is
+					let weekType = $('#block-9kyz3d9pe:contains("BLUE")').text();
+					let color = ''
+					if (weekType.toLocaleLowerCase().includes('blue')) {
+						weekType = 'Blue'
+						color = '#0099FF'
+					} else {
+						weekType = 'Orange'
+						color = '#F58216'
+					}
+
+
+					// get upcoming events
+					const blockContent = $('#block-fvlb7x2mh').html();
+
+					// log events in array
+					const $content = cheerio.load(blockContent);
+					const events = $content('p')
+						.toArray()
+						.map(p => '\u2022 ' + $content(p).text().trim())
+						.filter(content => content.length > 3) // Filter out empty strings
+						.join('\n');
+
+					let student = guild.roles.cache.get(discord_ids["roles"]["student"])
+					const scheduleAnnouncement = new EmbedBuilder()
+						.setTitle( 'Here\'s this week\'s update!')
+						.addFields(
+							{ name: weekType + ' Week', value: events },
+							{ name: 'Check out the full newsletter', value: url })
+						.setColor(color)
+					
+					let announcements = client.channels.cache.get(discord_ids["channels"]["announcements"])
+					announcements.send({ embeds: [scheduleAnnouncement] })
+					announcements.send(`${student}`)
+				}
+			},
+			null,
+			true,
+			'America/New_York'
+		)
 	},
 };
+
+async function getLatestUpdateURL() {
+	const response = await fetch('https://www.smore.com/u/jason.williams4');
+	const body = await response.text();
+	const re = 'https://www.smore.com/.{15,25}weekly-update#flyer-analytics'
+
+	const detectedURL = body.match(re)[0]
+	return detectedURL
+}
+
+function getNewWeek() {
+
+	var date = new Date();
+	date.setDate(date.getDate() + 1) // get next day for new week
+	var year = date.getFullYear().toString().substring(2);
+
+	var month = (1 + date.getMonth()).toString();
+	// month = month.length > 1 ? month : '0' + month;
+
+	var day = date.getDate().toString();
+	// day = day.length > 1 ? day : '0' + day;
+	return month + '-' + day + '-' + year;
+}
+
