@@ -96,9 +96,9 @@ module.exports = {
 				}
 			})
 
-		//send message at 9am and 9pm prompting new users to verify schoology
+		//send message at 4:20 prompting new users to verify schoology
 		let scheduledMessage = new CronJob(
-			'20 4 * * *',
+			'20 16 * * *',
 			async function () {
 
 				const joinReminder = new EmbedBuilder()
