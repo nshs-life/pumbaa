@@ -77,7 +77,7 @@ client.on('guildMemberAdd', member => {
         .addFields({ name: 'Our Mission', value: '[mission.nshs.life](https://docs.google.com/document/u/5/d/e/2PACX-1vToUA9QApqWmo_k5YGaouh1-FexC5tqLzUIZv6fJZGneyBZwM_ImYNDzraq3mT5FzQVS_EGC7Kdk_Oj/pub)' })
         .addFields({ name: 'Our Rules', value: '[rules.nshs.life](https://docs.google.com/document/u/5/d/e/2PACX-1vSJ1NB4b7RmcOWPEiDMXVQtug1nHvnzwaSjTvEBq_keDMVgDrut2aZxN6uGD8ccL8xMnvWFXIS8PT09/pub)' })
 
-        .addFields({ name: 'Join Requirement', value: 'Please message me your school email (example@newton.k12.ma.us) to access the rest of the nshs.life server' });
+        .addFields({ name: 'Join Requirement', value: 'Please message me "verify" to access the rest of the nshs.life server' });
 
     member.send({ embeds: [Embed] })
 })
@@ -114,7 +114,7 @@ client.on('messageCreate', msg => {
                     // Verify if they know what a school email is:
                     // Look at first 9 characters of email, check if it's a number
                     // See if last part of email is @newton.k12.ma.us
-                    if (msg.content.match(/\d{9}@newton.k12.ma.us/)) {
+                    if (msg.content.match(/verify/)) {
 
                         // Create Schoology OAuth Process
                         SchoologyAuthenticate(msg)
@@ -173,7 +173,7 @@ client.on('messageCreate', msg => {
                     // If they don't know what a school email is, DM them with an error
                     else {
                         const loginReqEmbed = new EmbedBuilder()
-                            .setTitle('Please type out your nps email in this dm')
+                            .setTitle('Please type "verify" in this dm')
                         msg.channel.send({ embeds: [loginReqEmbed] })
                     }
                     // If they're already a member:
