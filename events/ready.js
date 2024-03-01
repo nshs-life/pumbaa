@@ -103,7 +103,7 @@ module.exports = {
 
 				const joinReminder = new EmbedBuilder()
 					.setTitle('Hey there!')
-					.setDescription('It seems like you still have the New Member role. Remember to DM me your nps email (example@newton.k12.ma.us) to get access to the nshs.life server! If you have any questions, feel free to DM an admin')
+					.setDescription('It seems like you still have the New Member role. Remember to DM me "verify" to get access to the nshs.life server! If you have any questions, feel free to DM an admin')
 					.setColor(0x0099FF)
 
 				//send reminder to people with new member role
